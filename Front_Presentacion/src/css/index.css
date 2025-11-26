@@ -17,16 +17,21 @@
     box-sizing: border-box;
 }
 
+/* 
+  BODY: Ahora vuelve a ser un contenedor flex para centrar verticalmente su contenido.
+  El scroll se mantiene para cuando el formulario activo es muy largo.
+*/
 body {
     font-family: Arial, sans-serif;
+    background: var(--bg-gradient);
+    color: var(--dark);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 20px;
-    background: var(--bg-gradient);
-    color: var(--dark);
-    overflow: hidden;
+    overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 /* ✅ Ocultar el ojo del navegador en Chrome/Edge */
@@ -35,45 +40,45 @@ input::-ms-clear {
     display: none;
 }
 
-/* ✅ Contenedor de la tarjeta giratoria */
+/* 
+  FLIP-CONTAINER: Es el único hijo del body. 
+  Se centra horizontalmente con margin: 0 auto y su ancho máximo es 480px.
+*/
 .flip-container {
     width: 100%;
     max-width: 480px;
-    height: 600px;
-    /* ✅ Agrandado */
-    perspective: 1200px;
+    margin: 0 auto;
 }
 
-.flipper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-}
-
-.flipper.flipped {
-    transform: rotateY(180deg);
-}
-
+/*
+  FLIP-PANEL: Estilo base para ambos formularios.
+  Solo el panel con la clase 'active' se muestra.
+  El 'min-height: 400px' asegura un tamaño mínimo para que la tarjeta no se vea muy pequeña
+  cuando solo hay el formulario de login, pero permite crecer si el contenido es más largo.
+*/
 .flip-panel {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
     border-radius: var(--border-radius);
     background: var(--card-bg);
     box-shadow: var(--shadow);
-    padding: 48px 42px;
-    /* ✅ Más aire */
-    display: flex;
+    padding: 36px 42px 48px 42px;
+    display: none;
     flex-direction: column;
-    justify-content: center;
+    justify-content: center; /* 👈 CENTRAMOS EL CONTENIDO VERTICALMENTE DENTRO DEL PANEL */
+    min-height: 400px; /* 👈 Altura mínima para un buen aspecto */
+    animation: fadeIn 0.5s ease forwards;
 }
 
-.flip-panel.back {
-    transform: rotateY(180deg);
+.flip-panel.active {
+    display: flex;
 }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ... RESTO DE TUS ESTILOS PARA FORMULARIOS, BOTONES, ETC. ... */
+/* (No se ha tocado nada desde h2 en adelante) */
 
 h2 {
     font-size: 1.95rem;
@@ -86,6 +91,7 @@ h2 {
 .form-group {
     margin-bottom: 20px;
     text-align: left;
+    position: relative;
 }
 
 .form-group label {
@@ -96,32 +102,50 @@ h2 {
     font-size: 0.95rem;
 }
 
-.password-wrapper {
-    position: relative;
-}
-
-.form-group input {
+/* ✅ Estilo común para todos los campos editables */
+.form-group input,
+.form-group select {
     width: 100%;
-    padding: 14px 52px 14px 18px;
-    /* ✅ Más espacio para el ícono */
+    padding: 14px 18px;
     border: 2px solid #e8e8e8;
     border-radius: var(--border-radius);
     font-size: 1rem;
     font-family: Arial, sans-serif;
+    background-color: white;
+    color: var(--dark);
     transition: var(--transition);
-    /* ✅ Prevenir el ojo del navegador */
-    -webkit-text-security: none;
+    line-height: 1.4;
 }
 
-/* ✅Truco para evitar el ojo de Chrome */
-input[type="password"] {
+/* ✅ Estilo específico para input de contraseña (con botón de ojo) */
+.password-wrapper {
+    position: relative;
+}
+
+.form-group input[type="password"] {
+    padding-right: 52px; /* Espacio para el botón 👁️ */
     -webkit-text-security: disc !important;
 }
 
-.form-group input:focus {
+/* ✅ Enfoque (focus) para inputs y select */
+.form-group input:focus,
+.form-group select:focus {
     outline: none;
     border-color: var(--orange-500);
     box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2);
+}
+
+/* ✅ Estilo para el <select> */
+.form-group select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 16px;
+    padding-right: 48px; /* Espacio para la flecha */
 }
 
 /* ✅ Botón para mostrar/ocultar contraseña */
@@ -148,7 +172,6 @@ input[type="password"] {
     margin-top: 12px;
 }
 
-/* ✅ Barra de fuerza de contraseña */
 .strength-bar {
     height: 5px;
     background: #f0f0f0;
@@ -188,7 +211,8 @@ input[type="password"] {
     border-color: var(--success);
 }
 
-.form-group.invalid input {
+.form-group.invalid input,
+.form-group.invalid select {
     border-color: var(--error);
 }
 
@@ -242,16 +266,131 @@ input[type="password"] {
 
 /* ✅ ESTILOS RESPONSIVOS */
 @media (max-width: 520px) {
-    .flip-container {
-        height: auto;
-        min-height: 540px;
-    }
-
     .flip-panel {
         padding: 44px 26px;
+        min-height: 380px;
     }
 
     h2 {
         font-size: 1.75rem;
     }
+
+    .form-group input[type="password"] {
+        padding-right: 52px;
+    }
+
+    .form-group select {
+        padding-right: 44px;
+    }
+}
+
+/* ✅ Estilización de la barra de desplazamiento del body */
+body::-webkit-scrollbar {
+    width: 12px;
+}
+
+body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: var(--orange-500);
+    border-radius: 10px;
+    border: 3px solid var(--card-bg);
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background-color: var(--orange-600);
+}
+
+/* Estilo para el mensaje dinámico de la fuerza de la contraseña */
+.strength-message {
+    font-size: 0.82rem;
+    margin-top: 8px;
+    color: #777; /* Color gris por defecto */
+    font-family: Arial, sans-serif;
+}
+
+/* Colores específicos para cada estado */
+.strength-message.state-empty {
+    color: #777;
+}
+
+.strength-message.state-weak {
+    color: var(--error);
+}
+
+.strength-message.state-medium {
+    color: var(--orange-500);
+}
+
+.strength-message.state-strong {
+    color: var(--success);
+}
+
+/* =================== */
+/* ALERTA PERSONALIZADA - MEJORADA */
+/* =================== */
+
+.alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 250, 245, 0.8), rgba(255, 236, 218, 0.8));
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: fadeInOverlay 0.5s ease-out;
+}
+
+@keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.alert-box {
+    background: white;
+    padding: 32px 40px;
+    border-radius: 24px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: Arial, sans-serif;
+    max-width: 420px;
+    animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.alert-icon {
+    font-size: 3rem;
+    color: #4caf50;
+    margin-bottom: 16px;
+    animation: bounceIn 0.8s ease-out;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.alert-box h3 {
+    font-size: 1.5rem;
+    color: var(--dark);
+    margin: 0 0 12px 0;
+    font-weight: 600;
+}
+
+.alert-box p {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
 }

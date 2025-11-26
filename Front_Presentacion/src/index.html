@@ -10,131 +10,188 @@
 
 <body>
 
+  <!-- 
+    CONTENEDOR PRINCIPAL
+    Este <div> agrupa a los dos formularios (login y registro).
+    En el CSS, el body usa 'display: flex' para centrar este contenedor 
+    vertical y horizontalmente en la pantalla.
+  -->
   <div class="flip-container">
-    <div class="flipper" id="flipper">
 
-      <!--✅ Panel: Iniciar Sesión -->
-      <div class="flip-panel front">
+    <!-- 
+      PANEL DE INICIO DE SESIÓN
+      - 'flip-panel': Clase base que le da estilo de tarjeta (fondo, sombra, bordes).
+      - 'front': Identificador para que el JavaScript lo reconozca.
+      - 'active': CLASE CLAVE. En el CSS, solo el panel con esta clase se muestra (display: flex).
+                    Al cargar la página, este panel es el visible.
+    -->
+    <div class="flip-panel front active">
 
-        <h2>Iniciar Sesión</h2>
+      <h2>Iniciar Sesión</h2>
 
-        <form id="loginForm">
-          <!--✅ Email -->
-          <div class="form-group">
-            <label for="loginEmail">Correo electrónico</label>
-            <input type="email" id="loginEmail" required placeholder="usuario@dartkitchen.com" autocomplete="off" />
-            <div class="error">Por favor ingresa un correo válido.</div>
+      <!-- 
+        FORMULARIO DE LOGIN
+        El id 'loginForm' permite al JavaScript identificar este formulario 
+        para manejar su envío (ejecutar la función de login).
+      -->
+      <form id="loginForm">
+        
+        <!-- Grupo de campo: Correo electrónico -->
+        <div class="form-group">
+          <label for="loginEmail">Correo electrónico</label>
+          <input type="email" id="loginEmail" required placeholder="usuario@dartkitchen.com" autocomplete="off" />
+          <!-- Mensaje de error (oculto por defecto, se muestra con JS si hay un problema) -->
+          <div class="error">Por favor ingresa un correo válido.</div>
+        </div>
+
+        <!-- Grupo de campo: Contraseña -->
+        <div class="form-group">
+          <label for="loginPassword">Contraseña</label>
+          <div class="password-wrapper">
+            <!-- 
+              Campo de contraseña. 
+              El 'readonly' + 'onfocus' evita que aparezca el ícono de "ojo" nativo del navegador.
+            -->
+            <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="new-password"
+              readonly onfocus="this.removeAttribute('readonly');" />
+            <!-- 
+              Botón personalizado para mostrar/ocultar la contraseña.
+              El atributo 'data-target' le dice al JavaScript a qué input afecta.
+            -->
+            <button type="button" class="toggle-password-btn" data-target="loginPassword">👁️</button>
           </div>
+          <!-- Mensaje de error para credenciales inválidas -->
+          <div class="error">Email o contraseña incorrectos.</div>
+        </div>
 
-          <!--✅ Contraseña -->
-          <div class="form-group">
-            <label for="loginPassword">Contraseña</label>
-            <div class="password-wrapper">
-              <!--✅ readonly + onfocus para evitar el ojo del navegador -->
-              <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="new-password"
-                readonly onfocus="this.removeAttribute('readonly');" />
-              <button type="button" class="toggle-password-btn" data-target="loginPassword">👁️</button>
-            </div>
-            <div class="error">Email o contraseña incorrectos.</div>
-          </div>
+        <!-- Botón de envío del formulario de login -->
+        <button type="submit" class="btn btn-primary">Ingresar</button>
 
-          <!--✅ Botón Ingresar -->
-          <button type="submit" class="btn btn-primary">Ingresar</button>
-
-
-
-
-
-
-
-
-
-          <!--✅ Link para cambiar a Registro -->
-          <div class="switch-link">
-            ¿No tienes cuenta? <a id="switchToRegister">Regístrate</a>
-          </div>
-        </form>
-      </div>
-
-      <!--✅ Panel: Registrarse -->
-      <div class="flip-panel back">
-
-        <h2>Crear Cuenta</h2>
-
-<form id="registerForm">
-    <h3>Registro de Usuario</h3>
-    
-    <div class="form-group">
-        <label for="registerFirstName">Nombre</label>
-        <input type="text" id="registerFirstName" required placeholder="Tu nombre" autocomplete="given-name" />
-        <div class="error">El nombre es obligatorio.</div>
+        <!-- 
+          ENLACE PARA CAMBIAR A REGISTRO
+          El id 'switchToRegister' es escuchado por el JavaScript.
+          Al hacer clic, el JS quita la clase 'active' de este panel (front) 
+          y la agrega al panel de registro (back), mostrándolo.
+        -->
+        <div class="switch-link">
+          ¿No tienes cuenta? <a id="switchToRegister">Regístrate</a>
+        </div>
+      </form>
     </div>
 
-    <div class="form-group">
-        <label for="registerLastName">Apellido</label>
-        <input type="text" id="registerLastName" required placeholder="Tu apellido" autocomplete="family-name" />
-        <div class="error">El apellido es obligatorio.</div>
-    </div>
+    <!-- 
+      PANEL DE REGISTRO
+      - 'flip-panel': Mismo estilo base que el panel de login.
+      - 'back': Identificador para que el JavaScript lo reconozca.
+      - NO tiene la clase 'active', por lo que en el CSS está oculto (display: none) al inicio.
+    -->
+    <div class="flip-panel back">
 
-    <div class="form-group">
-        <label for="registerEmail">Correo electrónico</label>
-        <input type="email" id="registerEmail" required placeholder="tu@email.com" autocomplete="off" />
-        <div class="error">Por favor ingresa un correo válido.</div>
-    </div>
+      <h2>Crear Cuenta</h2>
 
-    <div class="form-group">
-        <label for="documentTypeId">Tipo de Documento</label>
-        <select id="documentTypeId" required>
+      <!-- 
+        FORMULARIO DE REGISTRO
+        El id 'registerForm' permite al JavaScript identificar este formulario 
+        para manejar su envío (ejecutar la función de registro).
+      -->
+      <form id="registerForm">
+        
+        <!-- Grupo de campo: Nombre -->
+        <div class="form-group">
+          <label for="registerFirstName">Nombre</label>
+          <input type="text" id="registerFirstName" required placeholder="Tu nombre" autocomplete="given-name" />
+          <div class="error">El nombre es obligatorio.</div>
+        </div>
+
+        <!-- Grupo de campo: Apellido -->
+        <div class="form-group">
+          <label for="registerLastName">Apellido</label>
+          <input type="text" id="registerLastName" required placeholder="Tu apellido" autocomplete="family-name" />
+          <div class="error">El apellido es obligatorio.</div>
+        </div>
+
+        <!-- Grupo de campo: Correo electrónico -->
+        <div class="form-group">
+          <label for="registerEmail">Correo electrónico</label>
+          <input type="email" id="registerEmail" required placeholder="tu@email.com" autocomplete="off" />
+          <div class="error">Por favor ingresa un correo válido.</div>
+        </div>
+
+        <!-- Grupo de campo: Tipo de Documento -->
+        <div class="form-group">
+          <label for="documentTypeId">Tipo de Documento</label>
+          <select id="documentTypeId" required>
             <option value="" disabled selected>Selecciona tipo</option>
             <option value="1">DNI</option>
             <option value="2">Pasaporte</option>
             <option value="3">Cédula de Extranjería</option>
-        </select>
-        <div class="error">Selecciona un tipo de documento.</div>
-    </div>
+          </select>
+          <div class="error">Selecciona un tipo de documento.</div>
+        </div>
 
-    <div class="form-group">
-        <label for="nroDocument">Número de Documento</label>
-        <input type="text" id="nroDocument" required placeholder="Nro. Documento" autocomplete="off" />
-        <div class="error">Ingresa un número de documento válido.</div>
-    </div>
-    
-    <div class="form-group">
-        <label for="registerPhone">Teléfono</label>
-        <input type="tel" id="registerPhone" required placeholder="999888777" autocomplete="tel" />
-        <div class="error">Ingresa un teléfono válido (mín. 7 dígitos).</div>
-    </div>
+        <!-- Grupo de campo: Número de Documento -->
+        <div class="form-group">
+          <label for="nroDocument">Número de Documento</label>
+          <input type="text" id="nroDocument" required placeholder="Nro. Documento" autocomplete="off" />
+          <div class="error">Ingresa un número de documento válido.</div>
+        </div>
+        
+        <!-- Grupo de campo: Teléfono -->
+        <div class="form-group">
+          <label for="registerPhone">Teléfono</label>
+          <input type="tel" id="registerPhone" required placeholder="123456789" autocomplete="tel" />
+          <div class="error">Ingresa un teléfono válido (mín. 7 dígitos).</div>
+        </div>
 
-    <div class="form-group">
-        <label for="registerPassword">Contraseña</label>
-        <div class="password-wrapper">
+        <!-- Grupo de campo: Contraseña (con indicador de fuerza) -->
+        <div class="form-group">
+          <label for="registerPassword">Contraseña</label>
+          <div class="password-wrapper">
             <input type="password" id="registerPassword" required placeholder="••••••••" autocomplete="new-password"
                 readonly onfocus="this.removeAttribute('readonly');" />
             <button type="button" class="toggle-password-btn" data-target="registerPassword">👁️</button>
-        </div>
-        <div class="password-strength">
-            <div class="strength-bar">
-                <div class="strength-fill" id="strengthFill"></div>
-            </div>
-            <div class="strength-text" id="strengthText">La contraseña debe tener al menos 8 caracteres, una mayúscula
-                y un número.</div>
-        </div>
-        <div class="error">La contraseña no cumple los requisitos.</div>
-    </div>
-
-
-    <button type="submit" class="btn btn-primary" id="registerSubmitBtn" disabled>Registrar</button>
-</form>
-          <!--✅ Link para cambiar a Iniciar Sesión -->    
-          <div class="switch-link">
-            ¿Ya tienes cuenta? <a id="switchToLogin">Inicia sesión</a>
           </div>
-        </form>
-      </div>
+          <!-- Indicador visual de la fuerza de la contraseña -->
+          <div class="password-strength">
+            <div class="strength-bar">
+              <div class="strength-fill" id="strengthFill"></div>
+            </div>
+            <!-- Mensaje dinámico que cambia según el estado de la contraseña -->
+            <div class="strength-message" id="strengthMessage">
+              La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.
+            </div>
+          </div>
+        </div>
 
+        <!-- 
+          Botón de envío del formulario de registro.
+          Está deshabilitado (disabled) hasta que todos los campos sean válidos (lo maneja el JS).
+        -->
+        <button type="submit" class="btn btn-primary" id="registerSubmitBtn" disabled>Registrar</button>
+      </form>
+
+      <!-- 
+        ENLACE PARA CAMBIAR A INICIO DE SESIÓN
+        El id 'switchToLogin' es escuchado por el JavaScript.
+        Al hacer clic, el JS quita la clase 'active' de este panel (back) 
+        y la agrega al panel de login (front), mostrándolo.
+      -->
+      <div class="switch-link">
+        ¿Ya tienes cuenta? <a id="switchToLogin">Inicia sesión</a>
+      </div>
     </div>
+
   </div>
 
+      <!-- Alerta personalizada para el registro exitoso (mejorada) -->
+  <div id="registerSuccessAlert" class="alert-overlay" style="display: none;">
+    <div class="alert-box">
+      <div class="alert-icon">✅</div>
+      <h3>¡Registro Exitoso!</h3>
+      <p>Ya puedes iniciar sesión con tus nuevas credenciales.</p>
+    </div>
+  </div>
+  <!-- Conecta el archivo JavaScript que maneja toda la lógica interactiva -->
   <script src="js/index.js"></script>
 
 </body>
