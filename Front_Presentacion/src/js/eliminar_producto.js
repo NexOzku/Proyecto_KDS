@@ -1,174 +1,148 @@
 // js/eliminar_producto.js
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const section = document.getElementById('eliminar-producto');
     if (!section) return;
 
-    // Datos de ejemplo (puedes reemplazar con datos reales)
-    let products = [
-        {
-            id: 1,
-            name: 'Hamburguesa Clásica',
-            category: 'Hamburguesas',
-            price: 18.50,
-            activeOrders: 2,
-            totalSales: 150,
-            status: 'active',
-            image: 'img/Hamburguesas/Burger clasica.jpeg'
-        },
-        {
-            id: 2,
-            name: 'Hamburguesa BBQ',
-            category: 'Hamburguesas',
-            price: 22.00,
-            activeOrders: 0,
-            totalSales: 320,
-            status: 'active',
-            image: 'img/Hamburguesas/Burger BBQ.jpeg'
-        },
-        {
-            id: 3,
-            name: 'Gaseosa',
-            category: 'Bebidas',
-            price: 5.50,
-            activeOrders: 5,
-            totalSales: 410,
-            status: 'active',
-            image: 'img/Bebidas/Gaseosa.jpg'
-        },
-        {
-            id: 4,
-            name: 'Hamburguesa Picante',
-            category: 'Hamburguesas',
-            price: 20.00,
-            activeOrders: 0,
-            totalSales: 45,
-            status: 'deleted',
-            image: 'img/Hamburguesas/Burger Picante.jpeg'
-        }
-    ];
+    let productos = [];
 
     // Referencias a elementos
-    const tbodyActive = section.querySelector('#tbody-active');
-    const tbodyDeleted = section.querySelector('#tbody-deleted');
-    const modal = document.querySelector('.eliminar-modal-overlay');
-    const modalMessage = modal?.querySelector('.eliminar-modal-body h3');
-    const modalCancel = modal?.querySelector('.eliminar-modal-footer .btn:not(.btn-danger)');
-    const modalConfirm = modal?.querySelector('.eliminar-modal-footer .btn-danger');
+    const tbodyActive = document.getElementById('tbody-active');
+    const tbodyDeleted = document.getElementById('tbody-deleted');
 
     let productToDelete = null;
 
-    // Renderiza las tablas
-    function renderTables() {
-        tbodyActive.innerHTML = '';
-        tbodyDeleted.innerHTML = '';
-
-        products
-            .filter(p => p.status === 'active')
-            .forEach(p => {
-                const row = createRow(p, false);
-                row.classList.add('fade-move');
-                setTimeout(() => row.classList.add('show'), 10);
-                tbodyActive.appendChild(row);
-            });
-
-        products
-            .filter(p => p.status === 'deleted')
-            .forEach(p => {
-                const row = createRow(p, true);
-                row.classList.add('fade-move');
-                setTimeout(() => row.classList.add('show'), 10);
-                tbodyDeleted.appendChild(row);
-            });
+    // Cargar productos desde la API
+    async function cargarProductos() {
+        try {
+            console.log('Cargando productos para eliminación...');
+            productos = await productAPI.getAll();
+            renderTablas();
+        } catch (error) {
+            console.error('Error cargando productos:', error);
+            showToast('Error al cargar productos', 'error');
+        }
     }
 
-    // Crea una fila de producto
-    function createRow(product, isDeleted) {
-        const tr = document.createElement('tr');
+    // Renderizar tablas de productos activos y eliminados
+    function renderTablas() {
+        // Limpiar tablas
+        if (tbodyActive) tbodyActive.innerHTML = '';
+        if (tbodyDeleted) tbodyDeleted.innerHTML = '';
 
-        const productCell = document.createElement('td');
-        productCell.className = 'product-cell';
-        const img = document.createElement('img');
-        img.src = product.image;
-        img.alt = product.name;
-        img.onerror = () => img.src = 'img/iconos/default-product.jpg';
-        const span = document.createElement('span');
-        span.textContent = product.name;
-        productCell.append(img, span);
+        // Separar activos y eliminados
+        const activos = productos.filter(p => !p.deleted);
+        const eliminados = productos.filter(p => p.deleted);
 
-        const categoryCell = document.createElement('td');
-        categoryCell.textContent = product.category;
-
-        const priceCell = document.createElement('td');
-        priceCell.textContent = `S/ ${product.price.toFixed(2)}`;
-
-        const ordersCell = document.createElement('td');
-        ordersCell.textContent = product.activeOrders;
-
-        const salesCell = document.createElement('td');
-        salesCell.textContent = product.totalSales;
-
-        const actionsCell = document.createElement('td');
-
-        if (isDeleted) {
-            const btn = document.createElement('button');
-            btn.className = 'btn btn-restore';
-            btn.textContent = '↺ Restaurar';
-            btn.type = 'button';
-            btn.onclick = () => {
-                product.status = 'active';
-                renderTables();
-            };
-            actionsCell.appendChild(btn);
-        } else {
-            const btn = document.createElement('button');
-            btn.className = 'btn btn-delete';
-            btn.textContent = '🗑 Eliminar';
-            btn.type = 'button';
-            btn.onclick = () => {
-                productToDelete = product;
-                let warning = product.activeOrders > 0
-                    ? '⚠️ Este producto tiene pedidos activos.\n'
-                    : '';
-                modalMessage.textContent = `${warning}¿Eliminar “${product.name}” del menú?`;
-                modal.classList.add('active');
-            };
-            actionsCell.appendChild(btn);
+        // Renderizar activos
+        if (tbodyActive) {
+            if (activos.length === 0) {
+                tbodyActive.innerHTML = '<tr><td colspan="6" class="no-data">No hay productos activos</td></tr>';
+            } else {
+                activos.forEach(producto => {
+                    const fila = crearFilaProducto(producto, 'active');
+                    tbodyActive.appendChild(fila);
+                });
+            }
         }
 
-        tr.append(productCell, categoryCell, priceCell, ordersCell, salesCell, actionsCell);
-        return tr;
-    }
-
-    // Configurar eventos del modal
-    if (modalConfirm) {
-        modalConfirm.addEventListener('click', () => {
-            if (productToDelete) {
-                productToDelete.status = 'deleted';
-                renderTables();
-                if (typeof showToast === 'function') {
-                    showToast(`Producto eliminado`, 'success');
-                }
+        // Renderizar eliminados
+        if (tbodyDeleted) {
+            if (eliminados.length === 0) {
+                tbodyDeleted.innerHTML = '<tr><td colspan="6" class="no-data">No hay productos eliminados</td></tr>';
+            } else {
+                eliminados.forEach(producto => {
+                    const fila = crearFilaProducto(producto, 'deleted');
+                    tbodyDeleted.appendChild(fila);
+                });
             }
-            modal.classList.remove('active');
-            productToDelete = null;
-        });
+        }
     }
 
-    if (modalCancel) {
-        modalCancel.addEventListener('click', () => {
-            modal.classList.remove('active');
-            productToDelete = null;
-        });
-    }
+// Mapa de IDs → nombres de categorías
+const categoriasMap = {
+    1: "burger",
+    2: "bebida",
+    3: "extra",
+    4: "postre",
+    6: "pollo",
+    7: "pollos y mas"
+};
 
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('active');
-                productToDelete = null;
+function crearFilaProducto(producto, estado) {
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-product-id', producto.id);
+
+    const precioFormato = formatCurrency(producto.price);
+
+    tr.innerHTML = `
+        <td><strong>${producto.name}</strong></td>
+
+        <!-- Aquí cambiamos el category_id por el NOMBRE -->
+        <td>${categoriasMap[producto.category_id] || 'Sin categoría'}</td>
+
+        <td>S/ ${precioFormato}</td>
+        <td>
+            ${estado === 'active'
+                ? `<button class="btn-delete" onclick="eliminarProducto(${producto.id})">🗑️ Eliminar</button>`
+                : ''
             }
-        });
+        </td>
+    `;
+
+    return tr;
+}
+
+    // Función global para eliminar producto
+    window.eliminarProducto = (productoId) => {
+        const producto = productos.find(p => p.id === productoId);
+        if (!producto) return;
+
+        if (confirm(`¿Está seguro de que desea eliminar "${producto.name}"?`)) {
+            realizarEliminacion(productoId);
+        }
+    };
+
+    // Función para realizar eliminación
+    async function realizarEliminacion(productoId) {
+        try {
+            console.log(`Eliminando producto ${productoId}...`);
+
+            // Llamar a la API para eliminar
+            await productAPI.delete(productoId);
+
+            const producto = productos.find(p => p.id === productoId);
+            showToast(`${producto.name} eliminado correctamente`, 'success');
+
+            // Recargar productos
+            await cargarProductos();
+
+        } catch (error) {
+            console.error('Error al eliminar:', error);
+            showToast(`Error al eliminar: ${error.message}`, 'error');
+        }
     }
 
-    renderTables();
+    // Función global para restaurar producto
+    window.restaurarProducto = async (productoId) => {
+        const producto = productos.find(p => p.id === productoId);
+        if (!producto) return;
+
+        try {
+            // Marcar como no eliminado
+            await productAPI.update(productoId, {
+                ...producto,
+                deleted: false
+            });
+
+            showToast(`${producto.name} restaurado correctamente`, 'success');
+            await cargarProductos();
+
+        } catch (error) {
+            console.error('Error al restaurar:', error);
+            showToast('Error al restaurar producto', 'error');
+        }
+    };
+
+    // Inicializar
+    await cargarProductos();
 });
