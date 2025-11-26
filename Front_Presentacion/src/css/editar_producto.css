@@ -1,0 +1,264 @@
+/* === Estilos de Editar Producto — alineados visualmente con Crear Producto === */
+
+#editar-producto .ep-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#editar-producto .ep-header {
+    background: white;
+    padding: 15px 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#editar-producto .ep-header h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+    color: #2563eb; /* Mismo color primario de Crear Producto */
+}
+
+#editar-producto .ep-header p {
+    margin: 5px 0 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* ===== BÚSQUEDA + LISTA DE PRODUCTOS ===== */
+#editar-producto .seccion-productos {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+}
+
+#editar-producto .busqueda-contenedor {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+#editar-producto .busqueda-contenedor input,
+#editar-producto .busqueda-contenedor select {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+#editar-producto .lista-productos {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+/* Scroll personalizado */
+#editar-producto .lista-productos::-webkit-scrollbar {
+    width: 8px;
+}
+#editar-producto .lista-productos::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+#editar-producto .lista-productos::-webkit-scrollbar-thumb {
+    background: #2563eb;
+    border-radius: 4px;
+}
+
+#editar-producto .producto-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#editar-producto .producto-item:hover {
+    background: #f8fafc; /* mismo hover que Crear Producto */
+}
+
+#editar-producto .producto-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 16px;
+}
+
+#editar-producto .producto-info h3 {
+    font-size: 1.05rem;
+    margin: 0 0 4px;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#editar-producto .producto-info .codigo {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+#editar-producto .producto-info .categoria {
+    font-size: 0.85rem;
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+#editar-producto .precio-container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    height: 100%;
+    width: 100%;
+    padding: 0 8px;
+}
+
+#editar-producto .producto-item .precio {
+    font-weight: bold;
+    color: #2563eb;
+    font-size: 1.1rem;
+    text-align: right;
+    align-self: flex-end;
+}
+
+/* ===== PANEL INFERIOR ===== */
+#editar-producto .panel-inferior {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 20px;
+}
+
+#editar-producto .panel-seccion {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+#editar-producto .panel-seccion h2 {
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #2563eb;
+}
+
+#editar-producto .form-group {
+    margin-bottom: 15px;
+}
+
+#editar-producto .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+#editar-producto .form-group input,
+#editar-producto .form-group select,
+#editar-producto .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: #fff;
+}
+
+#editar-producto .form-group input[readonly] {
+    background-color: #f8f8f8;
+    cursor: not-allowed;
+}
+
+#editar-producto .insumos-contenedor {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+#editar-producto .insumo-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+#editar-producto .insumo-item:last-child {
+    border-bottom: none;
+}
+
+#editar-producto .insumo-item .nombre {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+#editar-producto .insumo-item .costo {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+#editar-producto .insumo-item input[type="number"] {
+    width: 70px;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 4px;
+}
+
+/* Botón Guardar */
+#editar-producto .boton-guardar {
+    display: block;
+    margin: 24px 0 0 auto;
+    padding: 8px 16px;
+    background-color: #2563eb;
+    color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#editar-producto .boton-guardar:hover {
+    background-color: #3b82f6;
+}
+
+/* Mensaje de éxito */
+#editar-producto #mensaje {
+    text-align: center;
+    margin-top: 16px;
+    padding: 10px;
+    border-radius: 8px;
+    display: none;
+}
+
+#editar-producto .mensaje-exito {
+    background-color: #e8f5e9;
+    color: #4caf50;
+    border: 1px solid #c8e6c9;
+}
+
+.nota{
+    margin-top: 5px;
+    font-size: 13px;
+    color: #999;
+}

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Inventario en Tiempo Real</title>
+    <link rel="stylesheet" href="css/ControlInventario.css">
+</head>
+    
+<body>
+    <div class="header">
+        <div class="logo"><div class="logo-emoji">📦</div>Inventario en Tiempo Real</div>
+        <div class="header-stats">
+            <div class="stat-card" id="totalItems">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat-card warning" id="lowStockItems">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Stock Bajo</div>
+            </div>
+            <div class="stat-card danger" id="outOfStockItems">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Agotados</div>
+            </div>
+            <div class="stat-card" id="blockedProducts">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Bloqueados</div>
+            </div>
+        </div>
+        <div class="controls">
+            <button class="btn success" onclick="openRestockModal()">📦 Reponer Stock</button>
+            <button class="btn warning" onclick="simulateOrder()">🛒 Simular Pedido</button>
+            <button class="btn" onclick="generateReport()">📊 Reporte</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="section">
+                <div class="section-title">
+                    🏪 Inventario de Insumos
+                </div>
+                <div class="inventory-grid" id="inventoryGrid">
+                    <!-- Los items se cargarán dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="section">
+                <div class="section-title">
+                    🍽️ Catálogo de Productos
+                </div>
+                <div class="product-grid" id="productGrid">
+                    <!-- Los productos se cargarán dinámicamente -->
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    📈 Actividad Reciente
+                </div>
+                <div class="activity-feed" id="activityFeed">
+                    <!-- Las actividades se cargarán dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Reposición -->
+    <div class="modal" id="restockModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📦 Reponer Stock</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="restockItem">Seleccionar Item:</label>
+                <select class="form-input" id="restockItem">
+                    <!-- Opciones se cargarán dinámicamente -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="restockQuantity">Cantidad a Reponer:</label>
+                <input type="number" class="form-input" id="restockQuantity" min="1" placeholder="Ingrese cantidad">
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeRestockModal()">Cancelar</button>
+                <button class="btn success" onclick="confirmRestock()">Reponer</button>
+            </div>
+        </div>
+    </div>
+<script src="js/ControlInventario.js"></script>
+</body>
+
+</html>

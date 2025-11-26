@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MiBarrioBurger</title>
+  <link rel="stylesheet" href="css/catalogo.css">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=shopping_cart" />
+</head>
+
+<body>
+  <div class="grid">
+
+    <!--✅ ENCABEZADO -->
+    <div class="header">
+
+      <!--✅ Contenido del encabezado -->
+      <div class="header-content">
+
+        <!--✅ IZQUIERDA: Título -->
+        <div class="header-left">
+          <div class="header-title" id="logo">MiBarrioBurger</div>
+        </div>
+
+        <!--✅ CENTRO: Buscador -->
+        <div class="header-center">
+          <div class="header-search">
+            <input type="text" id="search-input" placeholder="Buscar en catálogo..." />
+          </div>
+        </div>
+
+        <!--✅ DERECHA: Iconos -->
+        <div class="header-right">
+
+          <!--✅ Carrito -->
+          <div class="cart-badge" id="carrito-container">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <span id="carrito-contador">0</span>
+          </div>
+
+          <!--✅ Separador -->
+          <div class="header-separator"></div>
+
+          <!--✅ Bloque USUARIO COMPLETO -->
+          <div class="header-user-block" id="user-menu-trigger">
+
+            <!--✅ Nombre y rol -->
+            <span class="header-user-name">
+              <span class="user-display-name"></span>
+              <span class="user-role-label" id="user-role"></span>
+            </span>
+
+            <!--✅ Avatar y flecha -->
+            <div class="header-user-avatar">
+              <img src="img/iconos/account_circle.svg" alt="Usuario" />
+              <span class="dropdown-icon" id="dropdown-icon">▼</span>
+            </div>
+          </div>
+
+          <!--✅ Icono original oculto -->
+          <span id="user-icon" style="display:none;">
+            <img src="img/iconos/account_circle.svg" alt="Usuario" />
+          </span>
+        </div>
+        
+      </div>
+
+      <!-- Menú desplegable -->
+      <div class="user-dropdown" id="user-dropdown">
+        <button class="dropdown-item" id="seguimiento-btn">Seguimiento de pedido</button>
+        <button class="dropdown-item" id="admin-panel-btn" style="display: none;">Admin Panel</button>
+        <!-- ✅ AGREGADO -->
+        <button class="dropdown-item" id="logout-btn">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <!--✅ NAVEGADOR -->
+    <div class="nav">
+      <div class="nav-item" data-section="all">☰</div>
+      <div class="nav-item" data-section="burgers">Hamburguesas</div>
+      <div class="nav-item" data-section="drinks">Bebidas</div>
+      <div class="nav-item" data-section="combos">Combos</div>
+    </div>
+
+    <!--✅ CATÁLOGO -->
+    <div class="catalog">
+      <div class="catalog-title">Catálogo de productos</div>
+
+      <!--✅ SECCIÓN HAMBURGUESAS -->
+      <div class="section" id="burgers-section">
+        <div class="section-title">Hamburguesas</div>
+        
+        <!--✅ Contenedor del carrusel -->
+        <div class="section-content">
+
+          <!--✅ Carrusel de hamburguesas -->
+          <div class="carousel-container">
+
+            <!--✅ Carrusel -->
+            <div class="carousel" id="burger-carousel">
+
+              <!--✅ Tarjetas de hamburguesas -->
+              <div class="carousel-card" data-name="clásica">
+                <img src="img/Hamburguesas/Burger clasica.jpeg" alt="Burger Clásica" />
+                <h3 class="product-name">Burger Clásica</h3>
+                <p class="product-desc">Carne, lechuga, tomate, queso</p>
+                <p class="product-price">S/.12.99</p>
+              </div>
+
+              <!--✅ Tarjetas de hamburguesas -->
+              <div class="carousel-card" data-name="doble">
+                <img src="img/Hamburguesas/Burger doble.jpeg" alt="Burger Doble" />
+                <h3 class="product-name">Burger Doble</h3>
+                <p class="product-desc">Doble carne, bacon, queso cheddar</p>
+                <p class="product-price">S/.16.99</p>
+              </div>
+
+              <!--✅ Tarjetas de hamburguesas -->
+              <div class="carousel-card" data-name="veggie">
+                <img src="img/Hamburguesas/Burger Veggie.jpeg" alt="Burger Veggie" />
+                <h3 class="product-name">Burger Veggie</h3>
+                <p class="product-desc">Vegetariana, aguacate, espinaca</p>
+                <p class="product-price">S/.13.99</p>
+              </div>
+
+              <!--✅ Tarjetas de hamburguesas -->
+              <div class="carousel-card" data-name="bbq">
+                <img src="img/Hamburguesas/Burger BBQ.jpeg" alt="Burger BBQ" />
+                <h3 class="product-name">Burger BBQ</h3>
+                <p class="product-desc">Salsa BBQ, cebolla caramelizada</p>
+                <p class="product-price">S/.14.99</p>
+              </div>
+
+              <!--✅ Tarjetas de hamburguesas -->
+              <div class="carousel-card" data-name="picante">
+                <img src="img/Hamburguesas/Burger Picante.jpeg" alt="Burger Picante" />
+                <h3 class="product-name">Burger Picante</h3>
+                <p class="product-desc">Jalapeños, salsa picante</p>
+                <p class="product-price">S/.15.99</p>
+              </div>
+
+              <!--✅ Tarjetas de hamburguesas -->
+              <div class="carousel-card" data-name="deluxe">
+                <img src="img/Hamburguesas/Burger deluxe.jpeg" alt="Burger Deluxe" />
+                <h3 class="product-name">Burger Deluxe</h3>
+                <p class="product-desc">Trufa, queso brie, rúcula</p>
+                <p class="product-price">S/.19.99</p>
+              </div>
+
+              <!--✅ Tarjetas de hamburguesas -->
+              <div class="carousel-card" data-name="mexicana">
+                <img src="img/Hamburguesas/Burger mexicana.webp" alt="Burger Mexicana" />
+                <h3 class="product-name">Burger Mexicana</h3>
+                <p class="product-desc">Chili, queso pepper jack, cilantro</p>
+                <p class="product-price">S/.17.99</p>
+              </div>
+
+              <!--✅ Tarjetas de hamburguesas -->
+              <div class="carousel-card" data-name="infantil">
+                <img src="img/Hamburguesas/Burger infantil.webp" alt="Burger Infantil" />
+                <h3 class="product-name">Burger Infantil</h3>
+                <p class="product-desc">Mini, queso, sin picante</p>
+                <p class="product-price">S/.9.99</p>
+              </div>
+            </div>
+          </div>
+
+          <!--✅ Navegación del carrusel -->
+          <div class="carousel-nav">
+            <button class="prev-btn" data-target="burger">◀</button>
+            <button class="next-btn" data-target="burger">▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!--✅ SECCIÓN BEBIDAS -->
+      <div class="section" id="drinks-section">
+        <div class="section-title">Bebidas</div>
+
+        <!--✅ Contenedor del carrusel -->
+        <div class="section-content">
+
+          <!--✅ Carrusel de bebidas -->
+          <div class="carousel-container">
+
+            <!--✅ Carrusel -->
+            <div class="carousel" id="drink-carousel">
+              <!--✅ Tarjetas de bebidas -->
+              <div class="carousel-card warning" data-name="gaseosa">
+                <img src="img/Bebidas/Gaseosa.jpg" alt="Gaseosa" />
+                <div class="warning-badge"><img src="img/iconos/block.svg" alt="Advertencia" /></div>
+                <h3 class="product-name">Gaseosa</h3>
+                <p class="product-desc">Refresco clásico</p>
+                <p class="product-price">S/.2.50</p>
+              </div>
+
+              <!--✅ Tarjetas de bebidas -->
+              <div class="carousel-card discount" data-name="jugo">
+                <img src="img/Bebidas/Jugo natural.jpg" alt="Jugo Natural" />
+                <div class="discount-badge"><img src="img/iconos/sell.svg" alt="Advertencia" /></div>
+                <h3 class="product-name">Jugo Natural</h3>
+                <p class="product-desc">Frutas frescas</p>
+                <p class="product-price">S/.3.00 (30% desc)</p>
+              </div>
+
+              <!--✅ Tarjetas de bebidas -->
+              <div class="carousel-card" data-name="cerveza">
+                <img src="img/Bebidas/Cerveza artesanal.jpg" alt="Cerveza" />
+                <h3 class="product-name">Cerveza Artesanal</h3>
+                <p class="product-desc">Local, 500ml</p>
+                <p class="product-price">S/.5.00</p>
+              </div>
+            </div>
+          </div>
+
+          <!--✅ Navegación del carrusel -->
+          <div class="carousel-nav">
+            <button class="prev-btn" data-target="drink">◀</button>
+            <button class="next-btn" data-target="drink">▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!--✅ SECCIÓN COMBOS -->
+      <div class="section" id="combos-section">
+        <div class="section-title">Combos</div>
+
+        <!--✅ Contenedor del carrusel -->
+        <div class="section-content">
+
+          <!--✅ Carrusel de combos -->
+          <div class="combos-content">
+
+            <!--✅ Carrusel -->
+            <div class="combos-empty" id="combos-empty">
+              <!--✅ Contenido cuando no hay combos -->
+              <div class="combos-empty-content">
+                <div class="icon"><!--<img src="img/iconos/warning.svg" alt="Advertencia">-->⚠️</div>
+                <p>No hay productos disponibles</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--✅ DETALLE DEL PRODUCTO -->
+    <div id="product-detail">
+      <!--✅ Botón Volver -->
+      <button id="back-to-catalog">
+        ← Volver al catálogo
+      </button>
+
+      <!--✅ Contenido del detalle -->
+      <h2 id="detail-title"></h2>
+
+      <!--✅ Imagen del producto -->
+      <div class="center-image">
+        <img id="detail-image" src="" alt="">
+      </div>
+
+      <!--✅ Descripción -->
+      <div>
+        <h3>Descripción:</h3>
+        <p id="detail-description"></p>
+      </div>
+
+      <!--✅ Personalización -->
+      <div style="margin-bottom: 24px;">
+        <h3 style="font-size: 18px; color: #d35400; margin-bottom: 12px;">Personalización:</h3>
+
+        <!--✅ TIPO 1: PAN -->
+        <div class="personalizacion-seccion">
+          <h4>🍞 Tipo de pan</h4>
+          <div class="personalizacion-opciones">
+            <label><input type="checkbox" data-price="0.00"> Pan clásico (sin cargo)</label>
+            <label><input type="checkbox" data-price="1.00"> Pan integral (+S/.1.00)</label>
+            <label><input type="checkbox" data-price="1.50"> Pan brioche premium (+S/.1.50)</label>
+          </div>
+        </div>
+
+        <!--✅ TIPO 2: QUESO -->
+        <div class="personalizacion-seccion">
+          <h4>🧀 Queso extra</h4>
+          <div class="personalizacion-opciones">
+            <label><input type="checkbox" data-price="0.00"> Sin queso extra</label>
+            <label><input type="checkbox" data-price="0.75"> Cheddar (+S/.0.75)</label>
+            <label><input type="checkbox" data-price="1.00"> Pepper Jack (+S/.1.00)</label>
+          </div>
+        </div>
+
+        <!--✅ TIPO 3: PROTEÍNA -->
+        <div class="personalizacion-seccion">
+          <h4>🥩 Proteína adicional</h4>
+          <div class="personalizacion-opciones">
+            <label><input type="checkbox" data-price="0.00"> Solo carne clásica</label>
+            <label><input type="checkbox" data-price="2.00"> Doble carne (+S/.2.00)</label>
+            <label><input type="checkbox" data-price="2.50"> Carne premium (angus) (+S/.2.50)</label>
+          </div>
+        </div>
+
+        <!--✅ TIPO 4: COMPLEMENTOS -->
+        <div class="personalizacion-seccion">
+          <h4>🥬 Complementos frescos</h4>
+          <div class="personalizacion-opciones">
+            <label><input type="checkbox" data-price="0.00"> Estándar (lechuga, tomate, cebolla)</label>
+            <label><input type="checkbox" data-price="0.50"> Aguacate (+S/.0.50)</label>
+            <label><input type="checkbox" data-price="0.75"> Cebolla caramelizada (+S/.0.75)</label>
+            <label><input type="checkbox" data-price="0.50"> Bacon crujiente (+S/.0.50)</label>
+          </div>
+        </div>
+      </div>
+
+      <!--✅ Precio y botón Agregar al carrito -->
+      <div style="text-align: center; margin-top: 20px;">
+        <!--✅ Precio total dinámico -->
+        <p id="detail-price"></p>
+        
+        <!--✅ Botón Agregar al carrito -->
+        <button id="add-to-cart-btn">
+          Agregar al carrito
+        </button>
+      </div>
+    </div>
+
+    <!--✅ PANEL DE SEGUIMIENTO (dentro de .grid) -->
+    <div id="seguimiento-container">
+    </div>
+  </div>
+
+  <!--✅ MODAL DEL CARRITO -->
+  <div id="modal-carrito" class="modal-carrito">
+    <div class="modal-contenido">
+      <span class="cerrar-modal" id="cerrarModalCarrito">&times;</span>
+      <h1>Carrito de Compras</h1>
+      <h3>Productos:</h3>
+      <div id="carrito-items" class="carrito-items"></div>
+      <div class="carrito-total">
+        <h2>Total: S/.<span id="total-general">0.00</span></h2>
+        <button id="btn-comprar">Comprar</button>
+      </div>
+    </div>
+  </div>
+
+  <!--✅ Alerta personalizada -->
+  <div id="custom-alert">
+    <div class="alert-box">
+      <h3><!--<img src="img/iconos/warning.svg" alt="Advertencia" style="width: 25px; height: 25px; vertical-align: middle; margin-right: 0;">-->
+        ⚠️Producto no disponible</h3>
+      <p>No hay stock disponible en este momento.</p>
+      <button id="close-alert">Aceptar</button>
+    </div>
+  </div>
+
+  <!--✅ MODAL DE CONFIRMACIÓN: CERRAR SESIÓN (diseño igual a admin) -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal confirm-modal">
+      <div class="modal-body">
+        <h3>¿Deseas cerrar sesión?</h3>
+        <div class="modal-footer">
+          <button class="btn" id="confirmCancel">Cancelar</button>
+          <button class="btn btn-danger" id="confirmProceed">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/catalogo.js"></script>
+</body>
+
+</html>
