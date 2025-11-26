@@ -81,171 +81,64 @@
       <div class="nav-item" data-section="all">☰</div>
       <div class="nav-item" data-section="burgers">Hamburguesas</div>
       <div class="nav-item" data-section="drinks">Bebidas</div>
-      <div class="nav-item" data-section="combos">Combos</div>
+      <div class="nav-item" data-section="combos">Postres</div>
     </div>
 
-    <!--✅ CATÁLOGO -->
-    <div class="catalog">
-      <div class="catalog-title">Catálogo de productos</div>
 
-      <!--✅ SECCIÓN HAMBURGUESAS -->
-      <div class="section" id="burgers-section">
-        <div class="section-title">Hamburguesas</div>
-        
-        <!--✅ Contenedor del carrusel -->
-        <div class="section-content">
+<!-- Catalogo de Productos -->
+<div class="catalog">
+  <div class="catalog-title">Catálogo de productos</div>
 
-          <!--✅ Carrusel de hamburguesas -->
-          <div class="carousel-container">
+  <!-- Hamburguesas -->
+  <div class="section" id="burgers-section">
+    <div class="section-title">Hamburguesas</div>
+    <div class="section-content">
+      <div class="carousel-container">
+        <div class="carousel" id="burger-carousel"></div>
+      </div>
+      <div class="carousel-nav">
+        <button class="prev-btn" data-target="burger">◀</button>
+        <button class="next-btn" data-target="burger">▶</button>
+      </div>
+    </div>
+  </div>
 
-            <!--✅ Carrusel -->
-            <div class="carousel" id="burger-carousel">
+  <!-- Bebidas -->
+  <div class="section" id="drinks-section">
+    <div class="section-title">Bebidas</div>
+    <div class="section-content">
+      <div class="carousel-container">
+        <div class="carousel" id="drink-carousel"></div>
+      </div>
+      <div class="carousel-nav">
+        <button class="prev-btn" data-target="drink">◀</button>
+        <button class="next-btn" data-target="drink">▶</button>
+      </div>
+    </div>
+  </div>
 
-              <!--✅ Tarjetas de hamburguesas -->
-              <div class="carousel-card" data-name="clásica">
-                <img src="img/Hamburguesas/Burger clasica.jpeg" alt="Burger Clásica" />
-                <h3 class="product-name">Burger Clásica</h3>
-                <p class="product-desc">Carne, lechuga, tomate, queso</p>
-                <p class="product-price">S/.12.99</p>
-              </div>
-
-              <!--✅ Tarjetas de hamburguesas -->
-              <div class="carousel-card" data-name="doble">
-                <img src="img/Hamburguesas/Burger doble.jpeg" alt="Burger Doble" />
-                <h3 class="product-name">Burger Doble</h3>
-                <p class="product-desc">Doble carne, bacon, queso cheddar</p>
-                <p class="product-price">S/.16.99</p>
-              </div>
-
-              <!--✅ Tarjetas de hamburguesas -->
-              <div class="carousel-card" data-name="veggie">
-                <img src="img/Hamburguesas/Burger Veggie.jpeg" alt="Burger Veggie" />
-                <h3 class="product-name">Burger Veggie</h3>
-                <p class="product-desc">Vegetariana, aguacate, espinaca</p>
-                <p class="product-price">S/.13.99</p>
-              </div>
-
-              <!--✅ Tarjetas de hamburguesas -->
-              <div class="carousel-card" data-name="bbq">
-                <img src="img/Hamburguesas/Burger BBQ.jpeg" alt="Burger BBQ" />
-                <h3 class="product-name">Burger BBQ</h3>
-                <p class="product-desc">Salsa BBQ, cebolla caramelizada</p>
-                <p class="product-price">S/.14.99</p>
-              </div>
-
-              <!--✅ Tarjetas de hamburguesas -->
-              <div class="carousel-card" data-name="picante">
-                <img src="img/Hamburguesas/Burger Picante.jpeg" alt="Burger Picante" />
-                <h3 class="product-name">Burger Picante</h3>
-                <p class="product-desc">Jalapeños, salsa picante</p>
-                <p class="product-price">S/.15.99</p>
-              </div>
-
-              <!--✅ Tarjetas de hamburguesas -->
-              <div class="carousel-card" data-name="deluxe">
-                <img src="img/Hamburguesas/Burger deluxe.jpeg" alt="Burger Deluxe" />
-                <h3 class="product-name">Burger Deluxe</h3>
-                <p class="product-desc">Trufa, queso brie, rúcula</p>
-                <p class="product-price">S/.19.99</p>
-              </div>
-
-              <!--✅ Tarjetas de hamburguesas -->
-              <div class="carousel-card" data-name="mexicana">
-                <img src="img/Hamburguesas/Burger mexicana.webp" alt="Burger Mexicana" />
-                <h3 class="product-name">Burger Mexicana</h3>
-                <p class="product-desc">Chili, queso pepper jack, cilantro</p>
-                <p class="product-price">S/.17.99</p>
-              </div>
-
-              <!--✅ Tarjetas de hamburguesas -->
-              <div class="carousel-card" data-name="infantil">
-                <img src="img/Hamburguesas/Burger infantil.webp" alt="Burger Infantil" />
-                <h3 class="product-name">Burger Infantil</h3>
-                <p class="product-desc">Mini, queso, sin picante</p>
-                <p class="product-price">S/.9.99</p>
-              </div>
-            </div>
-          </div>
-
-          <!--✅ Navegación del carrusel -->
-          <div class="carousel-nav">
-            <button class="prev-btn" data-target="burger">◀</button>
-            <button class="next-btn" data-target="burger">▶</button>
-          </div>
-        </div>
+  <!-- Combos -->
+  <div class="section" id="combos-section">
+    <div class="section-title">Postres</div>
+    <div class="section-content">
+      <div class="carousel-container">
+        <div class="carousel" id="combos-carousel"></div>
+      </div>
+      <div class="carousel-nav">
+        <button class="prev-btn" data-target="combos">◀</button>
+        <button class="next-btn" data-target="combos">▶</button>
       </div>
 
-      <!--✅ SECCIÓN BEBIDAS -->
-      <div class="section" id="drinks-section">
-        <div class="section-title">Bebidas</div>
-
-        <!--✅ Contenedor del carrusel -->
-        <div class="section-content">
-
-          <!--✅ Carrusel de bebidas -->
-          <div class="carousel-container">
-
-            <!--✅ Carrusel -->
-            <div class="carousel" id="drink-carousel">
-              <!--✅ Tarjetas de bebidas -->
-              <div class="carousel-card warning" data-name="gaseosa">
-                <img src="img/Bebidas/Gaseosa.jpg" alt="Gaseosa" />
-                <div class="warning-badge"><img src="img/iconos/block.svg" alt="Advertencia" /></div>
-                <h3 class="product-name">Gaseosa</h3>
-                <p class="product-desc">Refresco clásico</p>
-                <p class="product-price">S/.2.50</p>
-              </div>
-
-              <!--✅ Tarjetas de bebidas -->
-              <div class="carousel-card discount" data-name="jugo">
-                <img src="img/Bebidas/Jugo natural.jpg" alt="Jugo Natural" />
-                <div class="discount-badge"><img src="img/iconos/sell.svg" alt="Advertencia" /></div>
-                <h3 class="product-name">Jugo Natural</h3>
-                <p class="product-desc">Frutas frescas</p>
-                <p class="product-price">S/.3.00 (30% desc)</p>
-              </div>
-
-              <!--✅ Tarjetas de bebidas -->
-              <div class="carousel-card" data-name="cerveza">
-                <img src="img/Bebidas/Cerveza artesanal.jpg" alt="Cerveza" />
-                <h3 class="product-name">Cerveza Artesanal</h3>
-                <p class="product-desc">Local, 500ml</p>
-                <p class="product-price">S/.5.00</p>
-              </div>
-            </div>
-          </div>
-
-          <!--✅ Navegación del carrusel -->
-          <div class="carousel-nav">
-            <button class="prev-btn" data-target="drink">◀</button>
-            <button class="next-btn" data-target="drink">▶</button>
-          </div>
-        </div>
-      </div>
-
-      <!--✅ SECCIÓN COMBOS -->
-      <div class="section" id="combos-section">
-        <div class="section-title">Combos</div>
-
-        <!--✅ Contenedor del carrusel -->
-        <div class="section-content">
-
-          <!--✅ Carrusel de combos -->
-          <div class="combos-content">
-
-            <!--✅ Carrusel -->
-            <div class="combos-empty" id="combos-empty">
-              <!--✅ Contenido cuando no hay combos -->
-              <div class="combos-empty-content">
-                <div class="icon"><!--<img src="img/iconos/warning.svg" alt="Advertencia">-->⚠️</div>
-                <p>No hay productos disponibles</p>
-              </div>
-
-            </div>
-          </div>
+      <!-- mensaje vacío (solo si no hay combos) -->
+      <div class="combos-empty" id="combos-empty" style="display: none;">
+        <div class="combos-empty-content">
+          <div class="icon">⚠️</div>
+          <p>No hay productos disponibles</p>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
     <!--✅ DETALLE DEL PRODUCTO -->
     <div id="product-detail">

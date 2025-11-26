@@ -25,7 +25,87 @@ function showSection(sectionId) {
   currentFilter = sectionId;
 }
 
+const API_URL = 'http://burger-api-sandbox.com/auth/products';
 
+async function getProducts() {
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error('Error al obtener productos');
+    const data = await res.json();   // <- es el array con category_id, name, description, price, etc.
+    return data;
+  } catch (err) {
+    console.error('Error en getProducts:', err);
+    return [];
+  }
+}
+async function loadAndRenderProducts() {
+    // 1. Obtener los productos de la API
+    const products = await getProducts(); // Esta función trae los datos
+
+    if (!products || products.length === 0) {
+        console.log('No se pudieron cargar productos.');
+        return;
+    }
+
+    // 2. Definir los contenedores por ID
+    const burgerCarousel = document.getElementById('burger-carousel');   // ID para Categoría 1
+    const drinkCarousel = document.getElementById('drink-carousel');    // ID para Categoría 2
+    const combosCarousel = document.getElementById('combos-carousel');  // ID para Categoría 3
+    const combosEmpty = document.getElementById('combos-empty');
+
+
+    let combosCount = 0; // Contador para saber si hay combos
+
+
+
+
+  function createProductCard(product) {
+  const card = document.createElement('div');
+  card.classList.add('carousel-card');
+
+  card.innerHTML = `
+    <img src="${product.image || 'img/placeholder.png'}" alt="${product.name}">
+    <h3 class="product-name">${product.name}</h3>
+    <p class="product-desc">${product.description || ''}</p>
+    <span class="product-price">S/.${Number(product.price).toFixed(2)}</span>
+  `;
+
+  return card;
+}
+    // 3. Iterar y Distribuir los productos
+products.forEach(product => {
+  const card = createProductCard(product);
+
+  switch (product.category_id) {
+    case 1: // Hamburguesas
+      burgerCarousel.appendChild(card);
+      break;
+
+    case 2: // Bebidas
+      drinkCarousel.appendChild(card);
+      break;
+
+    case 4: // Combos (antes usabas 3)
+      combosCarousel.appendChild(card);
+      combosCount++;
+      break;
+
+    default:
+      console.warn(
+        `Producto "${product.name}" tiene una categoría desconocida: ${product.category_id}`
+      );
+  }
+});
+
+    // 4. Manejar el mensaje de "no hay combos"
+    if (combosCount === 0 && combosEmpty) {
+        combosCarousel.style.display = 'none'; // Ocultar el carrusel vacío
+        combosEmpty.style.display = 'block';   // Mostrar el mensaje de vacío
+    } else if (combosEmpty) {
+        combosCarousel.style.display = 'flex'; // Mostrar el carrusel (asumiendo que tiene display: flex)
+        combosEmpty.style.display = 'none';    // Ocultar el mensaje de vacío
+    }
+}
 document.addEventListener("DOMContentLoaded", () => {
     const user = JSON.parse(sessionStorage.getItem('user'));
 
@@ -75,22 +155,49 @@ function initCarousel(carouselId, visibleCount = 5) {
   const carousel = document.getElementById(carouselId);
   const cards = Array.from(carousel.children);
   const totalCards = cards.length;
-  const cardWidth = 262;
+  if (totalCards === 0) return;
+
+  const cardWidth = 262 + 22;
   let currentIndex = 0;
-  cards.forEach(card => {
-    card.style.minWidth = '240px';
-    card.style.marginRight = '22px';
-  });
+  const maxIndex = Math.max(0, totalCards - visibleCount);
+
   function updatePosition() {
     carousel.style.transform = `translateX(${-currentIndex * cardWidth}px)`;
   }
-  document.querySelectorAll(`.prev-btn[data-target="${carouselId.replace('-carousel', '')}"]`).forEach(btn => {
-    btn.addEventListener('click', () => { if (currentIndex > 0) { currentIndex--; updatePosition(); } });
-  });
-  document.querySelectorAll(`.next-btn[data-target="${carouselId.replace('-carousel', '')}"]`).forEach(btn => {
-    btn.addEventListener('click', () => { if (currentIndex < totalCards - visibleCount) { currentIndex++; updatePosition(); } });
-  });
+
+  document
+    .querySelectorAll(`.prev-btn[data-target="${carouselId.replace('-carousel', '')}"]`)
+    .forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          updatePosition();
+        }
+      });
+    });
+
+  document
+    .querySelectorAll(`.next-btn[data-target="${carouselId.replace('-carousel', '')}"]`)
+    .forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (currentIndex < maxIndex) {
+          currentIndex++;
+          updatePosition();
+        }
+      });
+    });
 }
+
+
+
+
+
+
+
+
+
+
+
 
 // ✅=== INICIALIZAR ===
 document.addEventListener('DOMContentLoaded', () => {
@@ -281,19 +388,6 @@ document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', () => showSection(item.getAttribute('data-section')));
 });
 
-// ✅=== LOGICA DE CATALOGO ===
-document.getElementById('logo')?.addEventListener('click', () => {
-  document.querySelector('.nav').style.display = 'flex';
-  document.querySelector('.catalog').style.display = 'block';
-  document.getElementById('product-detail').style.display = 'none';
-  const contenedor = document.getElementById('seguimiento-container');
-  if (contenedor) contenedor.style.display = 'none';
-  sessionStorage.setItem('vista-actual', 'catalogo');
-  showSection('all');
-  initCarousel('burger-carousel', 5);
-  initCarousel('drink-carousel', 3);
-  history.replaceState({}, document.title, window.location.pathname);
-});
 
 document.getElementById('search-input')?.addEventListener('input', (e) => filterCards(e.target.value));
 
@@ -310,6 +404,28 @@ if (customAlert) {
     }
   });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ✅=== CARRITO ===
 const modalCarrito = document.getElementById("modal-carrito");
@@ -331,6 +447,39 @@ if (cerrarModal) {
 window.addEventListener("click", (e) => {
   if (e.target === modalCarrito) modalCarrito.style.display = "none";
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ✅=== FUNCIONES DEL CARRITO ===
 function agregarAlCarrito(producto) {
@@ -434,6 +583,29 @@ function mostrarToast(texto) {
   }, 1500);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // ✅=== DETALLE DE PRODUCTO ===
 const catalogDiv = document.querySelector('.catalog');
 const productDetailDiv = document.getElementById('product-detail');
@@ -501,6 +673,9 @@ document.getElementById('btn-comprar')?.addEventListener('click', () => {
   guardarCarrito();
   window.location.href = 'pago.html';
 });
+
+
+
 
 // Nota: las reglas de animación y estilos del carrito ahora están en `css/catalogo.css`.
 
@@ -737,17 +912,23 @@ function mostrarCatalogo() {
   document.querySelector('.nav').style.display = 'flex';
   document.querySelector('.catalog').style.display = 'block';
   document.getElementById('product-detail').style.display = 'none';
+
   const seguimientoCont = document.getElementById('seguimiento-container');
   if (seguimientoCont) {
     seguimientoCont.style.display = 'none';
     seguimientoCont.classList.remove('seguimiento-vacio');
   }
+
   actualizarContadorCarrito();
   showSection('all');
-  initCarousel('burger-carousel', 5);
-  initCarousel('drink-carousel', 3);
-}
 
+  // 1) Cargar productos desde la API y pintarlos
+loadAndRenderProducts().then(() => {
+  initCarousel('burger-carousel', 1); // o 2
+  initCarousel('drink-carousel', 1);
+  initCarousel('combos-carousel', 1);
+});
+}
 // ✅=== Detectar si viene explícitamente como administrador ===
 const desdeAdmin = urlParams.has('from') && urlParams.get('from') === 'admin';
 const savedRole = sessionStorage.getItem('userRole');
