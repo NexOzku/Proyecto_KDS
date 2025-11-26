@@ -61,74 +61,68 @@
 
         <h2>Crear Cuenta</h2>
 
-<form id="registerForm">
-    <h3>Registro de Usuario</h3>
-    
-    <div class="form-group">
-        <label for="registerFirstName">Nombre</label>
-        <input type="text" id="registerFirstName" required placeholder="Tu nombre" autocomplete="given-name" />
-        <div class="error">El nombre es obligatorio.</div>
-    </div>
+        <form id="registerForm">
+          <h3>Registro de Usuario</h3>
 
-    <div class="form-group">
-        <label for="registerLastName">Apellido</label>
-        <input type="text" id="registerLastName" required placeholder="Tu apellido" autocomplete="family-name" />
-        <div class="error">El apellido es obligatorio.</div>
-    </div>
-
-    <div class="form-group">
-        <label for="registerEmail">Correo electrónico</label>
-        <input type="email" id="registerEmail" required placeholder="tu@email.com" autocomplete="off" />
-        <div class="error">Por favor ingresa un correo válido.</div>
-    </div>
-
-    <div class="form-group">
-        <label for="documentTypeId">Tipo de Documento</label>
-        <select id="documentTypeId" required>
-            <option value="" disabled selected>Selecciona tipo</option>
-            <option value="1">DNI</option>
-            <option value="2">Pasaporte</option>
-            <option value="3">Cédula de Extranjería</option>
-        </select>
-        <div class="error">Selecciona un tipo de documento.</div>
-    </div>
-
-    <div class="form-group">
-        <label for="nroDocument">Número de Documento</label>
-        <input type="text" id="nroDocument" required placeholder="Nro. Documento" autocomplete="off" />
-        <div class="error">Ingresa un número de documento válido.</div>
-    </div>
-    
-    <div class="form-group">
-        <label for="registerPhone">Teléfono</label>
-        <input type="tel" id="registerPhone" required placeholder="999888777" autocomplete="tel" />
-        <div class="error">Ingresa un teléfono válido (mín. 7 dígitos).</div>
-    </div>
-
-    <div class="form-group">
-        <label for="registerPassword">Contraseña</label>
-        <div class="password-wrapper">
-            <input type="password" id="registerPassword" required placeholder="••••••••" autocomplete="new-password"
-                readonly onfocus="this.removeAttribute('readonly');" />
-            <button type="button" class="toggle-password-btn" data-target="registerPassword">👁️</button>
-        </div>
-        <div class="password-strength">
-            <div class="strength-bar">
-                <div class="strength-fill" id="strengthFill"></div>
-            </div>
-            <div class="strength-text" id="strengthText">La contraseña debe tener al menos 8 caracteres, una mayúscula
-                y un número.</div>
-        </div>
-        <div class="error">La contraseña no cumple los requisitos.</div>
-    </div>
-
-
-    <button type="submit" class="btn btn-primary" id="registerSubmitBtn" disabled>Registrar</button>
-</form>
-          <!--✅ Link para cambiar a Iniciar Sesión -->    
-          <div class="switch-link">
-            ¿Ya tienes cuenta? <a id="switchToLogin">Inicia sesión</a>
+          <div class="form-group">
+            <label for="registerFirstName">Nombre</label>
+            <input type="text" id="registerFirstName" required placeholder="Tu nombre" autocomplete="given-name" />
+            <div class="error">El nombre es obligatorio.</div>
           </div>
+
+          <div class="form-group">
+            <label for="registerLastName">Apellido</label>
+            <input type="text" id="registerLastName" required placeholder="Tu apellido" autocomplete="family-name" />
+            <div class="error">El apellido es obligatorio.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="registerEmail">Correo electrónico</label>
+            <input type="email" id="registerEmail" required placeholder="tu@email.com" autocomplete="off" />
+            <div class="error">Por favor ingresa un correo válido.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="documentTypeId">Tipo de Documento</label>
+            <select id="documentTypeId" required>
+              <option value="" disabled selected>Selecciona tipo</option>
+              <option value="1">DNI</option>
+              <option value="2">Carnet de Extranjería</option>
+              <option value="3">Pasaporte</option>
+            </select>
+            <div class="error">Selecciona un tipo de documento.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="nroDocument">Número de Documento</label>
+            <input type="text" id="nroDocument" required placeholder="Nro. Documento" autocomplete="off" />
+            <div class="error">Ingresa un número de documento válido.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="registerPassword">Contraseña</label>
+            <div class="password-wrapper">
+              <input type="password" id="registerPassword" required placeholder="••••••••" autocomplete="new-password"
+                readonly onfocus="this.removeAttribute('readonly');" />
+              <button type="button" class="toggle-password-btn" data-target="registerPassword">👁️</button>
+            </div>
+            <div class="password-strength">
+              <div class="strength-bar">
+                <div class="strength-fill" id="strengthFill"></div>
+              </div>
+              <div class="strength-text" id="strengthText">La contraseña debe tener al menos 8 caracteres, una mayúscula
+                y un número.</div>
+            </div>
+            <div class="error">La contraseña no cumple los requisitos.</div>
+          </div>
+
+
+          <button type="submit" class="btn btn-primary" id="registerSubmitBtn" disabled>Registrar</button>
+        </form>
+        <!--✅ Link para cambiar a Iniciar Sesión -->
+        <div class="switch-link">
+          ¿Ya tienes cuenta? <a id="switchToLogin">Inicia sesión</a>
+        </div>
         </form>
       </div>
 
@@ -136,6 +130,7 @@
   </div>
 
   <script src="js/index.js"></script>
+  <script src="js/registro.js"></script>
 
 </body>
 
