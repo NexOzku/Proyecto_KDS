@@ -38,7 +38,7 @@
         showToast(message, isSuccess ? 'success' : 'error');
     }
 
-    // ✅ Nueva función: abre el modal existente con input numérico
+    // Abre el modal para cantidad de insumo
     function openCantidadModal(insumo, onAccept) {
         const form = document.getElementById('crudForm');
         document.getElementById('modalTitle').textContent = `Ingrese cantidad de "${insumo.nombre}" en ${insumo.unidad}:`;
@@ -86,20 +86,18 @@
             const descripcion = document.getElementById('cp-descripcion').value.trim();
             const categoria = document.getElementById('cp-categoria').value;
             const precio = document.getElementById('cp-precio').value;
-            const imagen = imagenInput.files[0];
 
-            if (!nombre) { showCustomAlert('El campo "Nombre del Producto" es obligatorio.'); return; }
-            if (!descripcion) { showCustomAlert('El campo "Descripción" es obligatorio.'); return; }
-            if (!categoria) { showCustomAlert('Seleccione una categoría.'); return; }
-            if (!precio || isNaN(precio) || parseFloat(precio) <= 0) { showCustomAlert('Ingrese un precio válido mayor a 0.'); return; }
-            if (!imagen) { showCustomAlert('Seleccione una imagen.'); return; }
+            if (!nombre || !descripcion || !categoria || !precio) {
+                showCustomAlert('Por favor, completa todos los campos del producto.');
+                return;
+            }
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imagePreview.innerHTML = `<img src="${e.target.result}" alt="Vista previa">`;
-                mostrarTab('insumos');
-            };
-            reader.readAsDataURL(imagen);
+            if (isNaN(precio) || precio <= 0) {
+                showCustomAlert('El precio debe ser un número válido mayor a 0.');
+                return;
+            }
+
+            mostrarTab('insumos');
         });
     }
 
@@ -115,23 +113,17 @@
             const li = document.createElement('li');
             li.className = 'cp-insumo-item';
             li.innerHTML = `
-            <div class="cp-insumo-info">
-                <strong>${insumo.nombre}</strong><br>
-                <small>Costo: S/ ${insumo.costo.toFixed(2)} / ${insumo.unidad}</small>
-            </div>
-            <button class="cp-add-btn" data-id="${insumo.id}">+</button>
+                <div class="cp-insumo-info">
+                    <strong>${insumo.nombre}</strong>
+                    <span>${insumo.unidad} - S/ ${insumo.costo.toFixed(2)}</span>
+                </div>
+                <button class="cp-add-btn" type="button">+ Agregar</button>
             `;
-            listaInsumos.appendChild(li);
-        });
-
-        document.querySelectorAll('#crear-producto .cp-add-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = parseInt(btn.dataset.id);
-                const insumo = insumosDisponibles.find(i => i.id === id);
-                if (!insumo) return;
-
+            li.querySelector('.cp-add-btn').addEventListener('click', (e) => {
+                e.preventDefault();
                 showCantidadModal(insumo);
             });
+            listaInsumos.appendChild(li);
         });
     }
 
@@ -152,7 +144,7 @@
             <td>${cantidad}</td>
             <td>S/ ${unitCost.toFixed(2)}</td>
             <td>S/ ${subtotal.toFixed(2)}</td>
-            <td><button class="cp-remove-btn" data-index="${index}">✕</button></td>
+            <td><button class="cp-remove-btn" type="button" data-index="${index}">✕</button></td>
             `;
             cuerpoSeleccionados.appendChild(tr);
         });
@@ -160,7 +152,8 @@
         costoTotalSpan.textContent = total.toFixed(2);
 
         document.querySelectorAll('#crear-producto .cp-remove-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
                 const idx = parseInt(btn.dataset.index);
                 insumosSeleccionados.splice(idx, 1);
                 renderizarSeleccionados();
@@ -169,22 +162,89 @@
     }
 
     if (btnCrear) {
-        btnCrear.addEventListener('click', () => {
+        btnCrear.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            // Validaciones
             if (insumosSeleccionados.length === 0) {
                 showCustomAlert('Debe seleccionar al menos un insumo.');
                 return;
             }
 
-            const codigo = 'PROD-' + Date.now().toString(36).toUpperCase();
-            const nombre = document.getElementById('cp-nombre').value;
+            const nombre = document.getElementById('cp-nombre').value.trim();
+            const descripcion = document.getElementById('cp-descripcion').value.trim();
+            const categoria = document.getElementById('cp-categoria').value;
+            const precio = parseFloat(document.getElementById('cp-precio').value);
+            const stock = parseInt(document.getElementById('cp-stock').value) || 0;
 
-            showCustomAlert(`¡Producto creado con éxito!\nCódigo: ${codigo}\nNombre: ${nombre}`, true);
+            if (!nombre || !descripcion || !categoria || !precio || isNaN(precio) || precio <= 0) {
+                showCustomAlert('Por favor, completa todos los campos correctamente.');
+                return;
+            }
 
-            document.getElementById('cp-productoForm').reset();
-            imagePreview.innerHTML = '<div class="cp-image-placeholder">📷 Arrastre o seleccione una imagen</div>';
-            insumosSeleccionados = [];
-            renderizarSeleccionados();
-            mostrarTab('detalle');
+            try {
+                // Preparar datos del producto
+                const productData = {
+                    name: nombre,
+                    description: descripcion,
+                    price: precio,
+                    category_id: parseInt(categoria),
+                    stock: stock
+                };
+
+                console.log('Creando producto con datos:', productData);
+
+                // Llamar a la API para crear el producto
+                const resultado = await productAPI.create(productData);
+
+                console.log('Producto creado exitosamente:', resultado);
+
+                showCustomAlert(`¡Producto ${nombre} creado con éxito!`, true);
+
+                // Limpiar formulario
+                document.getElementById('cp-productoForm').reset();
+                imagePreview.innerHTML = '<div class="cp-image-placeholder">📷 Arrastre o seleccione una imagen</div>';
+                insumosSeleccionados = [];
+                renderizarSeleccionados();
+                mostrarTab('detalle');
+
+            } catch (error) {
+                console.error('Error al crear producto:', error);
+                showCustomAlert(`Error al crear producto: ${error.message}`, false);
+            }
+        });
+    }
+
+    // Manejo de imagen
+    if (imagenInput) {
+        imagenInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    imagePreview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        imagePreview.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            imagePreview.classList.add('dragover');
+        });
+
+        imagePreview.addEventListener('dragleave', () => {
+            imagePreview.classList.remove('dragover');
+        });
+
+        imagePreview.addEventListener('drop', (e) => {
+            e.preventDefault();
+            imagePreview.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                imagenInput.files = files;
+                imagenInput.dispatchEvent(new Event('change'));
+            }
         });
     }
 

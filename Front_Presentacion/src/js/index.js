@@ -78,8 +78,23 @@ $('#loginForm').addEventListener('submit', async (e) => {
         sessionStorage.setItem('token', data.access_token);
         sessionStorage.setItem('user', JSON.stringify(data.user));
 
-        // Redirigir al dashboard
-        window.location.href = "catalogo.html";
+        // Determinar a dónde redirigir basado en roles y permisos
+        let redirectPage = "catalogo.html";
+        
+        if (data.user && data.user.roles) {
+            const roles = data.user.roles;
+            const permissions = data.user.permissions || [];
+            
+            // Si es admin o tiene permisos de gestión, ir a admin panel
+            if (roles.includes('admin') || permissions.includes('manage_products')) {
+                redirectPage = "admin.html";
+            }
+        }
+
+        console.log(`Redirigiendo a: ${redirectPage}`);
+        
+        // Redirigir
+        window.location.href = redirectPage;
 
     } catch (err) {
         console.error("Error al enviar login:", err);
