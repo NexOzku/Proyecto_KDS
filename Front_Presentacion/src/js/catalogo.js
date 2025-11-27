@@ -85,7 +85,7 @@ products.forEach(product => {
       drinkCarousel.appendChild(card);
       break;
 
-    case 4: // Combos (antes usabas 3)
+    case 4: // Combos (antes usabas 3) 
       combosCarousel.appendChild(card);
       combosCount++;
       break;
