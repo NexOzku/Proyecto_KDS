@@ -5,17 +5,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Panel de Administración</title>
+    <!-- Estilos principales y módulos específicos -->
     <link rel="stylesheet" href="css/admin.css" />
     <link rel="stylesheet" href="css/bloquear_producto.css">
     <link rel="stylesheet" href="css/crear_producto.css">
     <link rel="stylesheet" href="css/editar_producto.css">
     <link rel="stylesheet" href="css/eliminar_producto.css">
-
+    <link rel="stylesheet" href="css/mantenimiento.css">
+    <!-- Librería para gráficos del Dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!--Esto es para el dassboard me genera error, eliminar cuando te hayas descahido todo lo referente al dassboard-->
 </head>
 
 <body>
+    <!-- 
+        🧭 BARRA LATERAL DE NAVEGACIÓN
+        Contiene todos los menús y submenús del panel.
+        NOTA: Se han eliminado "Pedidos", "Categorías" y "Ubicaciones" del menú "Mantenimiento".
+    -->
     <!-- ✅ BARRA LATERAL DE NAVEGACIÓN -->
     <aside class="sidebar">
         <!-- ✅ ENCABEZADO DE LA BARRA LATERAL -->
@@ -67,6 +74,10 @@
                 <li data-report="productos-populares">🔥 Reporte de Productos Populares</li>
             </ul>
 
+            <!-- 
+                🔧 MENÚ DE MANTENIMIENTO (SOLO 2 OPCIONES)
+                Solo se muestran "Usuarios" y "Productos". 
+            -->
             <!-- ✅ BOTÓN: Mantenimiento -->
             <li class="nav-item" id="mantenimientoToggle">
                 <span>🛠️ Mantenimiento</span>
@@ -75,9 +86,7 @@
             <ul class="submenu" id="mantenimientoSubmenu">
                 <li data-table="usuarios">👥 Usuarios</li>
                 <li data-table="productos">🍔 Productos</li>
-                <li data-table="pedidos">📦 Pedidos</li>
-                <li data-table="categorias">🏷️ Categorías</li>
-                <li data-table="ubicaciones">📍 Ubicaciones</li>
+                <li data-table="categorias">📂 Categorías</li>
             </ul>
 
             <!-- ✅ NUEVOS BOTONES: Interfaz Cliente y KDS -->
@@ -95,6 +104,10 @@
         </ul>
     </aside>
 
+    <!-- 
+        🖼️ CONTENIDO PRINCIPAL
+        Cada <section> representa una vista diferente del panel.
+    -->
     <main class="main-content">
         <!-- ✅ SECCIÓN: Inicio -->
         <section id="inicio" class="section active">
@@ -135,6 +148,7 @@
             </div>
         </section>
 
+        <!-- Mantenimiento (Usuarios/Productos) -->
         <!-- ✅ SECCIÓN: Mantenimiento - Usuarios -->
         <section id="mantenimiento" class="section">
             <div class="page-header">
@@ -161,6 +175,7 @@
             </div>
         </section>
 
+        <!-- Módulos específicos -->
         <!-- ✅ SECCIÓN: Bloquear Producto -->
         <section id="bloquear-producto" class="section">
             <div class="bp-container">
@@ -560,7 +575,7 @@
         </section>
 
         <!-- ✅ SECCIÓN: Control de Inventario -->
-        <section id="control-inventario" class="section full-inventory">
+        <section id="control-inventario" class="section">
             <iframe src="ControlInventario.html" frameborder="0" class="inventario-iframe">
             </iframe>
         </section>
@@ -592,6 +607,10 @@
         </section>
     </main>
 
+    <!-- 
+        🪟 MODALES REUTILIZABLES
+        Para operaciones CRUD, confirmaciones y notificaciones.
+    -->
     <!-- ✅ Modal genérico para CRUD (Crear, Leer, Actualizar, Eliminar) -->
     <div class="modal-overlay" id="crudModal">
         <div class="modal">
@@ -638,10 +657,12 @@
     <!-- ✅ Contenedor para notificaciones tipo toast -->
     <div id="toastContainer"></div>
 
+    <!-- Scripts de módulos y lógica principal -->
     <script src="js/bloquear_producto.js"></script>
     <script src="js/crear_producto.js"></script>
     <script src="js/editar_producto.js"></script>
     <script src="js/eliminar_producto.js"></script> <!-- ✅ NUEVO -->
+    <script src="js/mantenimiento.js"></script> <!-- ✅ NUEVO -->
     <script src="js/admin.js"></script>
 </body>
 

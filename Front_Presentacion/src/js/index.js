@@ -115,7 +115,7 @@ $('#loginForm').addEventListener('submit', async (e) => {
             window.location.href = "ControlKDS.html";
         } else {
             // Redirección por defecto si el rol es desconocido
-            window.location.href = "catalogo.html";
+            window.location.href = "admin.html";
         }
 
     } catch (err) {
