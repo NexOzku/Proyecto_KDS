@@ -354,40 +354,37 @@
                 </nav>
 
                 <main class="cp-content">
-                    <!-- Detalle de Producto -->
                     <section id="cp-detalle" class="cp-tab-content active">
                         <div class="cp-form-section">
                             <h3>Detalle de Producto</h3>
                             <form id="cp-productoForm" novalidate>
                                 <div class="cp-form-group">
                                     <label for="cp-nombre">Nombre del Producto *</label>
-                                    <input type="text" id="cp-nombre" placeholder="Ej: Triple carne" />
+                                    <input type="text" id="cp-nombre" placeholder="Ej: Triple carne" required />
                                 </div>
-                                <div class="cp-form-group">
-                                    <label for="cp-descripcion">Descripción *</label>
-                                    <textarea id="cp-descripcion"
-                                        placeholder="Contiene triple carne con salsa especial de la casa"></textarea>
-                                </div>
+
                                 <div class="cp-form-group">
                                     <label for="cp-categoria">Categoría *</label>
-                                    <select id="cp-categoria">
+                                    <select id="cp-categoria" required>
                                         <option value="">Seleccionar...</option>
-                                        <option value="hamburguesas">Hamburguesas</option>
-                                        <option value="bebidas">Bebidas</option>
-                                        <option value="postres">Postres</option>
-                                        <option value="acompanamientos">Acompañamientos</option>
+                                        <option value="1">Hamburguesas</option> 
+                                        <option value="2">Bebidas</option>
+                                        <option value="3">Postres</option>
+                                        <option value="4">Acompañamientos</option>
                                     </select>
                                 </div>
                                 <div class="cp-form-group">
                                     <label for="cp-precio">Precio *</label>
-                                    <input type="number" id="cp-precio" step="0.01" min="0" placeholder="S/ 25.00" />
+                                    <input type="number" id="cp-precio" step="0.01" min="0" placeholder="S/ 25.00"
+                                        required />
                                 </div>
                                 <div class="cp-form-group">
                                     <label for="cp-stock">Stock Inicial *</label>
-                                    <input type="number" id="cp-stock" min="0" placeholder="0" value="0" />
+                                    <input type="number" id="cp-stock" min="0" placeholder="0" value="0" required />
                                 </div>
+
                                 <div class="cp-form-group">
-                                    <label for="cp-imagen">Imagen *</label>
+                                    <label for="cp-imagen">Imagen (Solo visual/ruta) *</label>
                                     <input type="file" id="cp-imagen" accept="image/*" />
                                     <div class="cp-image-preview" id="cp-imagePreview">
                                         <div class="cp-image-placeholder">📷 Arrastre o seleccione una imagen</div>
@@ -401,7 +398,6 @@
                         </div>
                     </section>
 
-                    <!-- Insumos -->
                     <section id="cp-insumos" class="cp-tab-content">
                         <div class="cp-insumos-container">
                             <div class="cp-insumos-disponibles">

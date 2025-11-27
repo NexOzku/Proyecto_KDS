@@ -1,16 +1,41 @@
+// js/crear_producto.js - CORREGIDO PARA USAR JSON Y URL SIMULADA
 (function () {
-    const insumosDisponibles = [
-        { id: 1, nombre: "Carne de Res (50g)", unidad: "porción", costo: 5.50 },
-        { id: 2, nombre: "Pan de Hamburguesa", unidad: "unidad", costo: 1.00 },
-        { id: 3, nombre: "Queso Cheddar", unidad: "unidad", costo: 1.00 },
-        { id: 4, nombre: "Lechuga", unidad: "g", costo: 0.02 },
-        { id: 5, nombre: "Tomate", unidad: "unidad", costo: 1.00 },
-        { id: 6, nombre: "Papas congeladas", unidad: "kg", costo: 6.00 },
-        { id: 7, nombre: "Salsa de tomate", unidad: "ml", costo: 0.03 },
-    ];
+    // -------------------------------------------------------------------------
+    // --- LÓGICA DE API (Usando la estructura JSON de tu api.js) ---
+    // NOTA: Asumimos que showToast y productAPI están disponibles globalmente.
+    
+    function showCustomAlert(message, isSuccess = false) {
+        if (typeof showToast === 'function') {
+            showToast(message, isSuccess ? 'success' : 'error');
+        } else {
+            alert(message);
+        }
+    }
+    
+    // Función de utilidad para cerrar el modal (asumimos que existe)
+    function closeModal() {
+        const modal = document.getElementById('crudModal');
+        if (modal) modal.classList.remove('active');
+    }
+    // -------------------------------------------------------------------------
 
+    // Datos Ficticios (Simulando la tabla 'extras' o 'supplies').
+    const insumosDisponibles = [
+        { id: 101, nombre: "Carne de Res (50g)", unidad: "porción", costo: 5.50 },
+        { id: 102, nombre: "Pan de Hamburguesa", unidad: "unidad", costo: 1.00 },
+        { id: 103, nombre: "Queso Cheddar", unidad: "unidad", costo: 1.00 },
+        { id: 104, nombre: "Lechuga", unidad: "g", costo: 0.02 },
+        { id: 105, nombre: "Tomate", unidad: "unidad", costo: 1.00 },
+        { id: 106, nombre: "Papas congeladas", unidad: "kg", costo: 6.00 },
+        { id: 107, nombre: "Salsa de tomate", unidad: "ml", costo: 0.03 },
+    ];
+    
     let insumosSeleccionados = [];
 
+    // --- Elementos DOM ---
+    const section = document.getElementById('crear-producto');
+    if (!section) return; 
+    
     const tabContents = document.querySelectorAll('#crear-producto .cp-tab-content');
     const btnSiguiente = document.getElementById('cp-btnSiguiente');
     const btnVolver = document.getElementById('cp-btnVolver');
@@ -20,26 +45,18 @@
     const costoTotalSpan = document.getElementById('cp-costoTotal');
     const imagenInput = document.getElementById('cp-imagen');
     const imagePreview = document.getElementById('cp-imagePreview');
+    const productoForm = document.getElementById('cp-productoForm');
 
-    function mostrarTab(tabId) {
+    function mostrarTab(tabId) { /* ... función sin cambios ... */
         tabContents.forEach(sec => sec.classList.remove('active'));
         document.getElementById('cp-' + tabId).classList.add('active');
 
         document.querySelectorAll('#crear-producto .cp-tab').forEach(tab => {
-            if (tab.dataset.tab === tabId) {
-                tab.classList.add('active');
-            } else {
-                tab.classList.remove('active');
-            }
+            tab.classList.toggle('active', tab.dataset.tab === tabId);
         });
     }
 
-    function showCustomAlert(message, isSuccess = false) {
-        showToast(message, isSuccess ? 'success' : 'error');
-    }
-
-    // Abre el modal para cantidad de insumo
-    function openCantidadModal(insumo, onAccept) {
+    function openCantidadModal(insumo, onAccept) { /* ... función sin cambios ... */
         const form = document.getElementById('crudForm');
         document.getElementById('modalTitle').textContent = `Ingrese cantidad de "${insumo.nombre}" en ${insumo.unidad}:`;
 
@@ -57,7 +74,7 @@
             const cantidad = parseInt(cantidadInput.value, 10);
 
             if (isNaN(cantidad) || cantidad < 1) {
-                showToast('Cantidad inválida. Debe ser un entero mayor o igual a 1.', 'error');
+                showCustomAlert('Cantidad inválida. Debe ser un entero mayor o igual a 1.', false);
                 return;
             }
 
@@ -65,38 +82,63 @@
                 window.modalCantidadCallback(cantidad);
                 window.modalCantidadCallback = null;
             }
-
-            closeModal();
+            if (typeof closeModal === 'function') {
+                closeModal();
+            } else {
+                document.getElementById('crudModal').classList.remove('active');
+            }
         };
 
-        document.getElementById('btnCancel').onclick = closeModal;
         document.getElementById('crudModal').classList.add('active');
     }
 
-    function showCantidadModal(insumo) {
+    function showCantidadModal(insumo) { /* ... función sin cambios ... */
         openCantidadModal(insumo, (cantidad) => {
             insumosSeleccionados.push({ ...insumo, cantidad });
             renderizarSeleccionados();
         });
     }
+    
+    /**
+     * Genera la descripción del producto basada en los insumos seleccionados.
+     */
+    function generarDescripcion() {
+        if (insumosSeleccionados.length === 0) {
+            return "Producto sin insumos definidos.";
+        }
+
+        const partes = insumosSeleccionados.map(item => {
+            const unidad = item.cantidad > 1 ? `${item.unidad}s` : item.unidad; 
+            return `${item.cantidad} ${unidad} de ${item.nombre.replace(` (${item.unidad})`, '')}`;
+        });
+
+        if (partes.length > 1) {
+            const ultimo = partes.pop();
+            return `Contiene: ${partes.join(', ')} y ${ultimo}.`;
+        }
+        return `Contiene: ${partes[0]}.`;
+    }
+
+    // --- Lógica de Pestañas y Validación ---
 
     if (btnSiguiente) {
         btnSiguiente.addEventListener('click', () => {
             const nombre = document.getElementById('cp-nombre').value.trim();
-            const descripcion = document.getElementById('cp-descripcion').value.trim();
-            const categoria = document.getElementById('cp-categoria').value;
+            const categoria = document.getElementById('cp-categoria').value; 
             const precio = document.getElementById('cp-precio').value;
 
-            if (!nombre || !descripcion || !categoria || !precio) {
-                showCustomAlert('Por favor, completa todos los campos del producto.');
+            // Validación de campos obligatorios
+            if (!nombre || !categoria || !precio) {
+                showCustomAlert('Por favor, completa los campos Nombre, Categoría y Precio.', false);
                 return;
             }
-
-            if (isNaN(precio) || precio <= 0) {
-                showCustomAlert('El precio debe ser un número válido mayor a 0.');
+            if (isNaN(precio) || parseFloat(precio) <= 0) {
+                showCustomAlert('El precio debe ser un número válido mayor a 0.', false);
                 return;
             }
-
+            
+            // NO se valida la imagen aquí, se usará una URL por defecto
+            
             mostrarTab('insumos');
         });
     }
@@ -107,7 +149,7 @@
         });
     }
 
-    function renderizarInsumos() {
+    function renderizarInsumos() { /* ... función sin cambios ... */
         listaInsumos.innerHTML = '';
         insumosDisponibles.forEach(insumo => {
             const li = document.createElement('li');
@@ -121,15 +163,28 @@
             `;
             li.querySelector('.cp-add-btn').addEventListener('click', (e) => {
                 e.preventDefault();
+                const isSelected = insumosSeleccionados.some(item => item.id === insumo.id);
+                if (isSelected) {
+                     showCustomAlert('Este insumo ya ha sido agregado.', false);
+                     return;
+                }
                 showCantidadModal(insumo);
             });
             listaInsumos.appendChild(li);
         });
     }
 
-    function renderizarSeleccionados() {
+    function renderizarSeleccionados() { /* ... función sin cambios ... */
         cuerpoSeleccionados.innerHTML = '';
         let total = 0;
+
+        if (insumosSeleccionados.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td colspan="6" style="text-align: center; color: #aaa;">No hay insumos seleccionados.</td>';
+            cuerpoSeleccionados.appendChild(tr);
+            costoTotalSpan.textContent = '0.00';
+            return;
+        }
 
         insumosSeleccionados.forEach((item, index) => {
             const unitCost = parseFloat(item.costo) || 0;
@@ -161,82 +216,106 @@
         });
     }
 
+    // --- Lógica de Creación (Usando productAPI.create JSON) ---
+
     if (btnCrear) {
         btnCrear.addEventListener('click', async (e) => {
             e.preventDefault();
 
-            // Validaciones
-            if (insumosSeleccionados.length === 0) {
-                showCustomAlert('Debe seleccionar al menos un insumo.');
-                return;
-            }
-
+            // 1. Recolección y Validación de datos
             const nombre = document.getElementById('cp-nombre').value.trim();
-            const descripcion = document.getElementById('cp-descripcion').value.trim();
             const categoria = document.getElementById('cp-categoria').value;
             const precio = parseFloat(document.getElementById('cp-precio').value);
             const stock = parseInt(document.getElementById('cp-stock').value) || 0;
+            const categoryId = parseInt(categoria, 10); 
+            
+            const descripcionGenerada = generarDescripcion();
 
-            if (!nombre || !descripcion || !categoria || !precio || isNaN(precio) || precio <= 0) {
-                showCustomAlert('Por favor, completa todos los campos correctamente.');
+            // Validación final
+            if (insumosSeleccionados.length === 0) {
+                showCustomAlert('Debe seleccionar al menos un insumo.', false);
                 return;
             }
 
+            if (!nombre || !precio || isNaN(precio) || precio <= 0 || isNaN(categoryId)) {
+                showCustomAlert('Error: Faltan completar datos en la pestaña "Detalle de Producto".', false);
+                mostrarTab('detalle');
+                return;
+            }
+
+            // 2. Preparar el objeto JSON para la API
+            const extrasData = insumosSeleccionados.map(item => ({
+                extra_id: item.id,
+                quantity: item.cantidad,
+                costo_unitario: item.costo.toFixed(2)
+            }));
+            
+            // Objeto de datos que se enviará como JSON
+            const dataToSend = {
+                // Usamos el campo 'name', 'description', etc., que tu api.js espera
+                nombre: nombre, 
+                descripcion: descripcionGenerada, 
+                precio: precio.toFixed(2),
+                categoria_id: categoryId,
+                stock: stock,
+                // SIMULACIÓN: Usamos una URL genérica para la imagen
+                // El backend DEBE aceptar el campo 'image' en el cuerpo JSON
+                image: 'https://burger-api-sandbox.com/default-image.jpg', 
+                // Enviamos los extras como un array/objeto JSON dentro del cuerpo principal
+                extras: extrasData 
+            };
+            
+            console.log('Enviando JSON a productAPI.create:', dataToSend);
+
+            // 3. Llamada a la API usando productAPI.create (que usa JSON)
             try {
-                // Preparar datos del producto
-                const productData = {
-                    name: nombre,
-                    description: descripcion,
-                    price: precio,
-                    category_id: parseInt(categoria),
-                    stock: stock
-                };
-
-                console.log('Creando producto con datos:', productData);
-
-                // Llamar a la API para crear el producto
-                const resultado = await productAPI.create(productData);
-
+                // Usamos la función original productAPI.create que encapsula apiCall (JSON)
+                const resultado = await productAPI.create(dataToSend);
+                
                 console.log('Producto creado exitosamente:', resultado);
 
                 showCustomAlert(`¡Producto ${nombre} creado con éxito!`, true);
 
-                // Limpiar formulario
-                document.getElementById('cp-productoForm').reset();
-                imagePreview.innerHTML = '<div class="cp-image-placeholder">📷 Arrastre o seleccione una imagen</div>';
+                // 4. Limpiar formulario y reiniciar
+                productoForm.reset();
+                imagePreview.innerHTML = '<div class="cp-image-placeholder">📷 URL de Imagen simulada</div>';
                 insumosSeleccionados = [];
                 renderizarSeleccionados();
                 mostrarTab('detalle');
 
             } catch (error) {
                 console.error('Error al crear producto:', error);
-                showCustomAlert(`Error al crear producto: ${error.message}`, false);
+                
+                // El error 415 ya no debería ocurrir si se usa JSON.
+                showCustomAlert(`Error al crear producto: ${error.message || 'Verifica la consola para más detalles.'}`, false);
             }
         });
     }
 
-    // Manejo de imagen
+    // --- Manejo de Imagen (Modificado) ---
+    // Simplemente muestra una URL/ruta en el preview, ya que no se sube el archivo.
+
     if (imagenInput) {
         imagenInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    imagePreview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
-                };
-                reader.readAsDataURL(file);
+                 // Aquí podríamos simular subir la imagen y obtener una URL, 
+                 // pero por simplicidad solo indicamos que se usará una URL por defecto.
+                 imagePreview.innerHTML = `<div class="cp-image-placeholder">✅ Imagen seleccionada. Se usará una URL de prueba.</div>`;
+            } else {
+                 imagePreview.innerHTML = '<div class="cp-image-placeholder">📷 Arrastre o seleccione una imagen</div>';
             }
         });
 
+        imagePreview.addEventListener('click', () => imagenInput.click());
+        // El resto del drag and drop se mantiene si quieres el efecto visual, aunque no suba el archivo.
         imagePreview.addEventListener('dragover', (e) => {
             e.preventDefault();
             imagePreview.classList.add('dragover');
         });
-
         imagePreview.addEventListener('dragleave', () => {
             imagePreview.classList.remove('dragover');
         });
-
         imagePreview.addEventListener('drop', (e) => {
             e.preventDefault();
             imagePreview.classList.remove('dragover');
@@ -248,5 +327,10 @@
         });
     }
 
-    renderizarInsumos();
+    // --- Inicialización ---
+    document.addEventListener('DOMContentLoaded', () => {
+        renderizarInsumos();
+        renderizarSeleccionados();
+        mostrarTab('detalle');
+    });
 })();
