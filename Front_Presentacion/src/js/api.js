@@ -1,3 +1,4 @@
+
 // API Configuration y funciones globales
 const API_BASE_URL = 'http://burger-api-sandbox.com';
 const API_PRODUCTS_ENDPOINT = '/auth/products';
