@@ -139,11 +139,12 @@
 }
 
 /* ===== PANEL INFERIOR ===== */
+/* ===== PANEL INFERIOR (CORRECCIÓN CLAVE) ===== */
 #editar-producto .panel-inferior {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    /* Cambiado de grid 1fr 1fr a una sola columna */
+    display: block; 
     margin-top: 20px;
+    padding-bottom: 50px; /* Espacio extra para el botón */
 }
 
 #editar-producto .panel-seccion {
@@ -152,6 +153,39 @@
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    /* Asegurar que el panel de detalle ocupe todo el ancho */
+    width: 100%; 
+    margin-bottom: 20px; /* Espacio antes del botón */
+}
+
+/* Nuevas clases para estructurar el formulario */
+#editar-producto .ep-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+#editar-producto .ep-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+/* Botón Guardar - Centrado o a la derecha del panel */
+#editar-producto .boton-guardar {
+    display: block;
+    margin: 24px 0 0 auto;
+    padding: 10px 20px; /* Un poco más grande */
+    /* ... (resto del estilo del botón) ... */
+}
+
+/* --- Responsive para dispositivos pequeños --- */
+@media (max-width: 768px) {
+    #editar-producto .ep-grid-2,
+    #editar-producto .ep-grid-3 {
+        grid-template-columns: 1fr; /* Apilar en pantallas pequeñas */
+        gap: 0;
+    }
 }
 
 #editar-producto .panel-seccion h2 {
