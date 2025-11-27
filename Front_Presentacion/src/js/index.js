@@ -44,11 +44,6 @@ $('#switchToLogin').addEventListener('click', (e) => {
 });
 
 
-
-
-
-
-
 $('#loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 

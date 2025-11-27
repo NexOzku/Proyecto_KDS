@@ -166,56 +166,36 @@
         <h3 style="font-size: 18px; color: #d35400; margin-bottom: 12px;">Personalización:</h3>
 
         <!--✅ TIPO 1: PAN -->
-        <div class="personalizacion-seccion">
-          <h4>🍞 Tipo de pan</h4>
-          <div class="personalizacion-opciones">
-            <label><input type="checkbox" data-price="0.00"> Pan clásico (sin cargo)</label>
-            <label><input type="checkbox" data-price="1.00"> Pan integral (+S/.1.00)</label>
-            <label><input type="checkbox" data-price="1.50"> Pan brioche premium (+S/.1.50)</label>
-          </div>
-        </div>
+<div class="personalizacion-seccion" id="sec-pan">
+  <h4>🍞 Tipo de pan</h4>
+  <div class="personalizacion-opciones" id="opts-pan"></div>
+</div>
 
-        <!--✅ TIPO 2: QUESO -->
-        <div class="personalizacion-seccion">
-          <h4>🧀 Queso extra</h4>
-          <div class="personalizacion-opciones">
-            <label><input type="checkbox" data-price="0.00"> Sin queso extra</label>
-            <label><input type="checkbox" data-price="0.75"> Cheddar (+S/.0.75)</label>
-            <label><input type="checkbox" data-price="1.00"> Pepper Jack (+S/.1.00)</label>
-          </div>
-        </div>
+<div class="personalizacion-seccion" id="sec-queso">
+  <h4>🧀 Queso extra</h4>
+  <div class="personalizacion-opciones" id="opts-queso"></div>
+</div>
 
-        <!--✅ TIPO 3: PROTEÍNA -->
-        <div class="personalizacion-seccion">
-          <h4>🥩 Proteína adicional</h4>
-          <div class="personalizacion-opciones">
-            <label><input type="checkbox" data-price="0.00"> Solo carne clásica</label>
-            <label><input type="checkbox" data-price="2.00"> Doble carne (+S/.2.00)</label>
-            <label><input type="checkbox" data-price="2.50"> Carne premium (angus) (+S/.2.50)</label>
-          </div>
-        </div>
+<div class="personalizacion-seccion" id="sec-proteina">
+  <h4>🥩 Proteína adicional</h4>
+  <div class="personalizacion-opciones" id="opts-proteina"></div>
+</div>
 
-        <!--✅ TIPO 4: COMPLEMENTOS -->
-        <div class="personalizacion-seccion">
-          <h4>🥬 Complementos frescos</h4>
-          <div class="personalizacion-opciones">
-            <label><input type="checkbox" data-price="0.00"> Estándar (lechuga, tomate, cebolla)</label>
-            <label><input type="checkbox" data-price="0.50"> Aguacate (+S/.0.50)</label>
-            <label><input type="checkbox" data-price="0.75"> Cebolla caramelizada (+S/.0.75)</label>
-            <label><input type="checkbox" data-price="0.50"> Bacon crujiente (+S/.0.50)</label>
-          </div>
-        </div>
-      </div>
-
+<div class="personalizacion-seccion" id="sec-complementos">
+  <h4>Complementos</h4>
+  <div class="personalizacion-opciones" id="opts-complementos"></div>
+</div>
       <!--✅ Precio y botón Agregar al carrito -->
       <div style="text-align: center; margin-top: 20px;">
         <!--✅ Precio total dinámico -->
         <p id="detail-price"></p>
         
         <!--✅ Botón Agregar al carrito -->
-        <button id="add-to-cart-btn">
-          Agregar al carrito
-        </button>
+<button id="add-to-cart-btn">
+  Agregar al carrito
+</button>
+      </div>
+        </div>
       </div>
     </div>
 
@@ -260,7 +240,6 @@
       </div>
     </div>
   </div>
-
   <script src="js/catalogo.js"></script>
 </body>
 

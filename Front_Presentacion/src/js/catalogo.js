@@ -1,10 +1,26 @@
 let currentFilter = 'all';
+let ALL_PRODUCTS = [];
+let DRINK_OPTIONS = [];
+const CART = [];
+const cartModal     = document.getElementById('modal-carrito');
+const cartItemsDiv  = document.getElementById('carrito-items');
+const cartTotalSpan = document.getElementById('total-general');
+const closeCartSpan = document.getElementById('cerrarModalCarrito');
+const cartIconBtn   = document.getElementById('cart-button');
+const cartCountSpan = document.getElementById('cart-count'); 
+
+function initDrinkOptions() {
+  DRINK_OPTIONS = ALL_PRODUCTS.filter(p => Number(p.category_id) === 9);
+}
+const detailTitle       = document.getElementById('detail-title');
+const detailImage       = document.getElementById('detail-image');
+const detailDescription = document.getElementById('detail-description');
+const detailPrice       = document.getElementById('detail-price');
 let carrito = JSON.parse(sessionStorage.getItem('carrito')) || [];
 // Parámetros de URL (global para evitar ReferenceError cuando se usan fuera de DOMContentLoaded)
 const urlParams = new URLSearchParams(window.location.search);
 
 // ✅=== FUNCIONES EXISTENTES (NO MODIFICADAS) ===
-
 // ✅Función para mostrar secciones del catálogo
 function showSection(sectionId) {
   document.querySelectorAll('.carousel-card').forEach(card => {
@@ -41,12 +57,13 @@ async function getProducts() {
 async function loadAndRenderProducts() {
     // 1. Obtener los productos de la API
     const products = await getProducts(); // Esta función trae los datos
-
+    ALL_PRODUCTS = products;
+    
     if (!products || products.length === 0) {
         console.log('No se pudieron cargar productos.');
         return;
     }
-
+    initDrinkOptions();
     // 2. Definir los contenedores por ID
     const burgerCarousel = document.getElementById('burger-carousel');   // ID para Categoría 1
     const drinkCarousel = document.getElementById('drink-carousel');    // ID para Categoría 2
@@ -56,12 +73,331 @@ async function loadAndRenderProducts() {
 
     let combosCount = 0; // Contador para saber si hay combos
 
+//Actualizar el Precio de Extras
+function renderDynamicOptions(product) {
+  const panCont   = document.getElementById('opts-pan');
+  const quesoCont = document.getElementById('opts-queso');
+  const protCont  = document.getElementById('opts-proteina');
+  const compCont  = document.getElementById('opts-complementos');
+
+  // limpiar anteriores
+  [panCont, quesoCont, protCont, compCont].forEach(c => c.innerHTML = '');
+
+  if (!Array.isArray(product.extras)) return;
+
+  product.extras.forEach(extra => {
+    const label = document.createElement('label');
+    label.innerHTML = `
+      <input type="checkbox" data-price="${extra.price}">
+      ${extra.name} (+S/.${Number(extra.price).toFixed(2)})
+    `;
+
+    switch (extra.extra_type) {        // campo que definas en la BD
+      case 'pan':
+        panCont.appendChild(label);
+        break;
+      case 'queso':
+        quesoCont.appendChild(label);
+        break;
+      case 'proteina':
+        protCont.appendChild(label);
+        break;
+      case 'complemento':
+      default:
+        compCont.appendChild(label);
+        break;
+    }
+  });
+}
+
+function renderDynamicOptionsFromCategories() {
+  const panCont   = document.getElementById('opts-pan');
+  const quesoCont = document.getElementById('opts-queso');
+  const protCont  = document.getElementById('opts-proteina');
+  const compCont  = document.getElementById('opts-complementos');
+
+  [panCont, quesoCont, protCont, compCont].forEach(c => c.innerHTML = '');
+
+  const panes  = ALL_PRODUCTS.filter(p => p.category_id === 6);
+  const quesos = ALL_PRODUCTS.filter(p => p.category_id === 7);
+  const prot   = ALL_PRODUCTS.filter(p => p.category_id === 8);
+  const extras = ALL_PRODUCTS.filter(p => p.category_id === 3);
+
+  const renderGroup = (items, container, groupName) => {
+    items.forEach(item => {
+      const label = document.createElement('label');
+      label.innerHTML = `
+        <input type="checkbox"
+               data-price="${item.price}"
+               data-id="${item.id}"
+               data-group="${groupName}">
+        ${item.name} (+S/.${Number(item.price).toFixed(2)})
+      `;
+      container.appendChild(label);
+    });
+  };
+
+  renderGroup(panes,  panCont,   'pan');
+  renderGroup(quesos, quesoCont, 'queso');
+  renderGroup(prot,   protCont,  'proteina');
+  renderGroup(extras, compCont,  'complemento'); // aquí sí quieres múltiples, luego lo dejamos libre
+}
+const secPan   = document.getElementById('sec-pan');
+const secQueso = document.getElementById('sec-queso');
+const secProt  = document.getElementById('sec-proteina');
+const secComp  = document.getElementById('sec-complementos');
+const catalogDiv       = document.querySelector('.catalog');
+const productDetailDiv = document.getElementById('product-detail');
 
 
 
-  function createProductCard(product) {
+
+function openProductDetail(product, mode = 'burger') {
+  const basePrice = Number(product.price);
+
+  detailTitle.textContent       = product.name;
+  detailImage.src               = product.image || 'img/placeholder.png';
+  detailImage.alt               = product.name;
+  detailDescription.textContent = product.description || '';
+  detailPrice.textContent       = `Precio: S/.${basePrice.toFixed(2)}`;
+
+  if (mode === 'burger') {
+    // Mostrar todas las secciones
+    secPan.style.display   = '';
+    secQueso.style.display = '';
+    secProt.style.display  = '';
+    secComp.style.display  = '';
+
+    secPan.querySelector('h4').textContent = '🍞 Tipo de pan';
+    renderDynamicOptionsFromCategories();   // usa data-group en cada sección
+
+  } else if (mode === 'drink') {
+    // Solo "Tipo de bebida"
+    secPan.style.display   = '';
+    secQueso.style.display = 'none';
+    secProt.style.display  = 'none';
+    secComp.style.display  = 'none';
+
+    secPan.querySelector('h4').textContent = '🥤 Tipo de bebida';
+
+    const panCont = document.getElementById('opts-pan');
+    panCont.innerHTML = '';
+
+    const drinkOptions = ALL_PRODUCTS.filter(p => Number(p.category_id) === 9);
+    drinkOptions.forEach(opt => {
+      const label = document.createElement('label');
+      label.innerHTML = `
+        <input type="checkbox"
+               data-price="${opt.price}"
+               data-id="${opt.id}"
+               data-group="drink">
+        ${opt.name} (+S/.${Number(opt.price).toFixed(2)})
+      `;
+      panCont.appendChild(label);
+    });
+
+  } else if (mode === 'dessert') {
+    // Solo "Opciones de postre"
+    secPan.style.display   = '';
+    secQueso.style.display = 'none';
+    secProt.style.display  = 'none';
+    secComp.style.display  = 'none';
+
+    secPan.querySelector('h4').textContent = '🍰 Opciones de postre';
+
+    const panCont = document.getElementById('opts-pan');
+    panCont.innerHTML = '';
+
+    const dessertOptions = ALL_PRODUCTS.filter(p => Number(p.category_id) === 10);
+    dessertOptions.forEach(opt => {
+      const label = document.createElement('label');
+      label.innerHTML = `
+        <input type="checkbox"
+               data-price="${opt.price}"
+               data-id="${opt.id}"
+               data-dessert-name="${opt.name}">
+        ${opt.name} (+S/.${Number(opt.price).toFixed(2)})`;
+      panCont.appendChild(label);
+    });
+
+    // Lógica especial "Sin extra"
+    const dessertInputs = secPan.querySelectorAll('input[type="checkbox"]');
+    let sinExtraInput = null;
+
+    dessertInputs.forEach(inp => {
+      const name = (inp.dataset.dessertName || '').toLowerCase();
+      if (name.includes('sin extra')) sinExtraInput = inp;
+    });
+
+    dessertInputs.forEach(inp => {
+      inp.onchange = () => {
+        if (inp === sinExtraInput) {
+          if (sinExtraInput.checked) {
+            dessertInputs.forEach(other => {
+              if (other !== sinExtraInput) {
+                other.checked  = false;
+                other.disabled = true;
+              }
+            });
+          } else {
+            dessertInputs.forEach(other => {
+              if (other !== sinExtraInput) {
+                other.disabled = false;
+              }
+            });
+          }
+        } else {
+          if (sinExtraInput && inp.checked) {
+            sinExtraInput.checked  = false;
+            sinExtraInput.disabled = false;
+          }
+        }
+
+        // Recalcular precio total
+        let total = basePrice;
+        const allInputs = document.querySelectorAll(
+          '#product-detail input[type="radio"], #product-detail input[type="checkbox"]'
+        );
+        allInputs.forEach(c => {
+          if (c.checked) total += parseFloat(c.dataset.price || 0);
+        });
+        detailPrice.textContent = `Precio: S/.${total.toFixed(2)}`;
+      };
+    });
+
+    // Mostrar detalle y salir (para no sobrescribir onchange)
+    catalogDiv.style.display       = 'none';
+    productDetailDiv.style.display = 'block';
+
+    // Conectar botón "Agregar al carrito" también para postres
+    console.log('openProductDetail ejecutado para:', product.name, 'modo:', mode);
+    addBtnDessert.onclick = null;
+    addBtnDessert.onclick = () => {
+      const selectedInputs = document.querySelectorAll(
+        '#product-detail input[type="checkbox"], #product-detail input[type="radio"]'
+      );
+
+      const extras = [];
+      let finalPrice = basePrice;
+
+      selectedInputs.forEach(inp => {
+        if (inp.checked) {
+          const price = Number(inp.dataset.price || 0);
+          finalPrice += price;
+          extras.push({
+            id:    Number(inp.dataset.id || 0),
+            price: price,
+            group: inp.dataset.group || null,
+            name:  inp.parentElement.textContent.trim()
+          });
+        }
+      });
+
+      const cartItem = {
+        product_id:  product.id,
+        name:        product.name,
+        base_price:  basePrice,
+        final_price: finalPrice,
+        extras
+      };
+
+      CART.push(cartItem);
+      if (cartCountSpan) cartCountSpan.textContent = String(CART.length);
+
+      productDetailDiv.style.display = 'none';
+      catalogDiv.style.display       = 'block';
+    };
+
+    return;
+  }
+
+  // Mostrar detalle (hamburguesas y bebidas)
+// Mostrar detalle (hamburguesas y bebidas)
+  catalogDiv.style.display       = 'none';
+  productDetailDiv.style.display = 'block';
+
+  // Lógica genérica: suma de precios + selección única por grupo
+  const inputs = document.querySelectorAll(
+    '#product-detail input[type="radio"], #product-detail input[type="checkbox"]'
+  );
+  inputs.forEach(i => i.checked = false);
+
+  inputs.forEach(input => {
+    input.onchange = () => {
+      const group = input.dataset.group || '';
+
+      // Grupos con solo una opción permitida
+      if (group === 'pan' || group === 'queso' || group === 'proteina' || group === 'drink') {
+        if (input.checked) {
+          inputs.forEach(other => {
+            if (other !== input && other.dataset.group === group) {
+              other.checked = false;
+            }
+          });
+        }
+      }
+      // 'complemento' queda libre (varias opciones)
+
+      let total = basePrice;
+      inputs.forEach(c => {
+        if (c.checked) total += parseFloat(c.dataset.price || 0);
+      });
+      detailPrice.textContent = `Precio: S/.${total.toFixed(2)}`;
+    };
+  });
+
+  // Conectar botón "Agregar al carrito" (hamburguesas y bebidas)
+  const addBtn = document.getElementById('add-to-cart-btn');
+  console.log('addBtn dentro de openProductDetail:', addBtn);
+  if (!addBtn) return;
+
+  addBtn.onclick = () => {
+    console.log('CLICK EN AGREGAR CARRITO');
+
+    const selectedInputs = document.querySelectorAll(
+      '#product-detail input[type="checkbox"], #product-detail input[type="radio"]'
+    );
+
+    const extras = [];
+    let finalPrice = basePrice;
+
+    selectedInputs.forEach(inp => {
+      if (inp.checked) {
+        const price = Number(inp.dataset.price || 0);
+        finalPrice += price;
+        extras.push({
+          id:    Number(inp.dataset.id || 0),
+          price: price,
+          group: inp.dataset.group || null,
+          name:  inp.parentElement.textContent.trim()
+        });
+      }
+    });
+
+    const cartItem = {
+      product_id:  product.id,
+      name:        product.name,
+      base_price:  basePrice,
+      final_price: finalPrice,
+      extras
+    };
+
+CART.push(cartItem);
+console.log('CARRITO AHORA:', CART);
+
+if (cartCountSpan) {
+  cartCountSpan.textContent = String(CART.length);
+}
+  };
+}
+
+
+
+function createProductCard(product) {
   const card = document.createElement('div');
   card.classList.add('carousel-card');
+
+  card.productData = product;
 
   card.innerHTML = `
     <img src="${product.image || 'img/placeholder.png'}" alt="${product.name}">
@@ -69,6 +405,19 @@ async function loadAndRenderProducts() {
     <p class="product-desc">${product.description || ''}</p>
     <span class="product-price">S/.${Number(product.price).toFixed(2)}</span>
   `;
+
+card.addEventListener('click', () => {
+  const p = card.productData;
+  const catId = Number(p.category_id);
+
+  if (catId === 1) {
+    openProductDetail(p, 'burger');
+  } else if (catId === 2) {
+    openProductDetail(p, 'drink');
+  } else if (catId === 4) {        // categoría de helados/postres
+    openProductDetail(p, 'dessert');
+  }
+});
 
   return card;
 }
@@ -190,14 +539,52 @@ function initCarousel(carouselId, visibleCount = 5) {
 
 
 
+function renderCartModal() {
+  console.log('renderCartModal, CART:', CART);
+  cartItemsDiv.innerHTML = '';
+  let total = 0;
 
+  if (!CART.length) {
+    cartItemsDiv.innerHTML = '<p style="text-align:center;color:#999;">Tu carrito está vacío</p>';
+    cartTotalSpan.textContent = '0.00';
+    return;
+  }
 
+  CART.forEach(item => {
+    total += item.final_price;
 
+    const div = document.createElement('div');
+    div.classList.add('carrito-item');
+    div.innerHTML = `
+      <p><strong>${item.name}</strong> - S/.${item.final_price.toFixed(2)}</p>
+      ${item.extras.length ? `
+        <ul>
+          ${item.extras.map(e => `<li>${e.name} (+S/.${e.price.toFixed(2)})</li>`).join('')}
+        </ul>
+      ` : '<p>Sin extras</p>'}
+      <hr>
+    `;
+    cartItemsDiv.appendChild(div);
+  });
 
+  cartTotalSpan.textContent = total.toFixed(2);
+}
 
+function openCartModal() {
+  renderCartModal();              // ← importante
+  cartModal.style.display = 'block';
+}
 
+function closeCartModal() {
+  cartModal.style.display = 'none';
+}
 
+if (cartIconBtn)   cartIconBtn.onclick   = openCartModal;
+if (closeCartSpan) closeCartSpan.onclick = closeCartModal;
 
+window.addEventListener('click', (e) => {
+  if (e.target === cartModal) closeCartModal();
+});
 
 // ✅=== INICIALIZAR ===
 document.addEventListener('DOMContentLoaded', () => {
@@ -263,7 +650,6 @@ document.addEventListener('DOMContentLoaded', () => {
         roleElement.textContent = user.roles[0] ?? "Cliente";
     }
 });
-
   // ✅=== Configurar el menú desplegable ===
   if (trigger && dropdown && icon) {
     // ✅Toggle del menú
@@ -451,10 +837,26 @@ window.addEventListener("click", (e) => {
 
 
 
+function renderOptionsByCategory(categoryId) {
+  const container = document.getElementById('opts-pan'); // mismo que usas en drink/dessert
+  if (!container) return; // evita el error si por algo no existe
 
+  container.innerHTML = '';
 
+  const items = ALL_PRODUCTS.filter(p => Number(p.category_id) === categoryId);
 
-
+  items.forEach(item => {
+    const label = document.createElement('label');
+    label.innerHTML = `
+      <input type="checkbox"
+             data-price="${item.price}"
+             data-id="${item.id}"
+             data-group="drink">
+      ${item.name} (+S/.${Number(item.price).toFixed(2)})
+    `;
+    container.appendChild(label);
+  });
+}
 
 
 
@@ -674,7 +1076,62 @@ document.getElementById('btn-comprar')?.addEventListener('click', () => {
   window.location.href = 'pago.html';
 });
 
+//Mostrar Bebidas 
+let currentDrink = null;
+let currentDrinkBase = 0;
 
+const drinkModal   = document.getElementById('drink-modal');
+const drinkOptsDiv = document.getElementById('drink-options-container');
+const drinkOkBtn   = document.getElementById('drink-ok');
+const drinkCancelBtn = document.getElementById('drink-cancel');
+
+function openDrinkModal(product) {
+  
+  currentDrink = product;
+  currentDrinkBase = Number(product.price);
+
+  // limpiar
+  drinkOptsDiv.innerHTML = '';
+
+  // renderizar opciones desde BD (cat 9)
+  DRINK_OPTIONS.forEach((opt, idx) => {
+    const label = document.createElement('label');
+    label.innerHTML = `
+      <input type="radio"
+             name="drink-temp"
+             value="${opt.id}"
+             data-extra-price="${opt.price}"
+             ${idx === 0 ? 'checked' : ''}>
+      ${opt.name} (+S/.${Number(opt.price).toFixed(2)})
+    `;
+    drinkOptsDiv.appendChild(label);
+  });
+
+  drinkModal.style.display = 'flex';
+}
+
+function closeDrinkModal() {
+  drinkModal.style.display = 'none';
+  currentDrink = null;
+}
+
+drinkCancelBtn.onclick = closeDrinkModal;
+
+drinkOkBtn.onclick = () => {
+  if (!currentDrink) return;
+  const selected = document.querySelector('input[name="drink-temp"]:checked');
+  const extra = selected ? Number(selected.dataset.extraPrice) : 0;
+  const finalPrice = currentDrinkBase + extra;
+
+  const selectedOptionId = selected ? Number(selected.value) : null;
+
+  // aquí luego integras con tu carrito
+  console.log('Bebida:', currentDrink.name,
+              'opciónId:', selectedOptionId,
+              'precio final:', finalPrice);
+
+  closeDrinkModal();
+};
 
 
 // Nota: las reglas de animación y estilos del carrito ahora están en `css/catalogo.css`.
