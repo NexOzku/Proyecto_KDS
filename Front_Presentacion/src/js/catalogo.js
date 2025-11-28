@@ -6,8 +6,8 @@ const cartModal     = document.getElementById('modal-carrito');
 const cartItemsDiv  = document.getElementById('carrito-items');
 const cartTotalSpan = document.getElementById('total-general');
 const closeCartSpan = document.getElementById('cerrarModalCarrito');
-const cartIconBtn   = document.getElementById('cart-button');
-const cartCountSpan = document.getElementById('cart-count'); 
+const cartIconBtn   = document.getElementById('carrito-container');
+const cartCountSpan = document.getElementById('carrito-contador'); 
 
 function initDrinkOptions() {
   DRINK_OPTIONS = ALL_PRODUCTS.filter(p => Number(p.category_id) === 9);
@@ -150,7 +150,123 @@ const catalogDiv       = document.querySelector('.catalog');
 const productDetailDiv = document.getElementById('product-detail');
 
 
+// =================================================================
+// 🔥 PASO 1: FUNCIONES AUXILIARES PARA EL MANEJO DE DATA PERSISTENTE
+// Agrega esto ANTES de la función 'openProductDetail'
+// =================================================================
 
+const CART_STORAGE_KEY = 'miBarrioBurgerCart'; 
+
+/** Obtiene el carrito de localStorage */
+function getCart() {
+    try {
+        const cartJson = localStorage.getItem(CART_STORAGE_KEY);
+        // Aseguramos que cada ítem tenga un ID temporal y cantidad al recuperarse
+        return cartJson ? JSON.parse(cartJson).map(item => ({
+            ...item,
+            temp_id: item.temp_id || Date.now() + Math.random().toString(16).slice(2),
+            quantity: item.quantity || 1
+        })) : [];
+    } catch (e) {
+        console.error("Error al obtener el carrito de localStorage:", e);
+        return [];
+    }
+}
+
+
+
+/** Actualiza el contador numérico del carrito */
+function updateCartCount() {
+    const cart = getCart();
+    // Suma la cantidad (quantity) de cada ítem en el carrito
+    const count = cart.reduce((acc, item) => acc + (item.quantity || 0), 0); 
+    if (cartCountSpan) {
+        cartCountSpan.textContent = String(count);
+    }
+}
+/** Guarda el carrito en localStorage y actualiza el contador */
+function saveCart(cartArray) {
+    try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartArray));
+        updateCartCount();
+    } catch (e) {
+        console.error("Error al guardar el carrito en localStorage:", e);
+    }
+}
+
+/** Elimina un ítem del carrito por su ID temporal (Usada por el botón 'X') */
+function removeItemFromCart(temp_id) {
+    const cart = getCart();
+    const newCart = cart.filter(item => item.temp_id !== temp_id);
+    saveCart(newCart);
+    renderCartModal(); // Llama a la función existente para re-renderizar
+}
+
+
+/** Actualiza la cantidad de un ítem (Usada por el input number) */
+function updateItemQuantity(temp_id, newQuantity) {
+    const cart = getCart();
+    let quantity = parseInt(newQuantity);
+    // Asegura que la cantidad sea al menos 1
+    if (isNaN(quantity) || quantity <= 0) quantity = 1; 
+    
+    const itemIndex = cart.findIndex(item => item.temp_id === temp_id);
+    if (itemIndex !== -1) {
+        cart[itemIndex].quantity = quantity;
+        saveCart(cart);
+        renderCartModal(); // Llama a la función existente para re-renderizar
+    }
+}
+
+/**
+ * 🔥 NUEVA FUNCIÓN INTERMEDIA: Reúne la lógica de adición y guarda el ítem.
+ * Esta función será llamada por los onclick del botón "Agregar al Carrito".
+ */
+function addToCartHelper(product, basePrice) {
+    const selectedInputs = document.querySelectorAll(
+        '#product-detail input[type="checkbox"]:checked, #product-detail input[type="radio"]:checked'
+    );
+
+    const extras = [];
+    let finalPrice = basePrice;
+
+    selectedInputs.forEach(inp => {
+        const price = Number(inp.dataset.price || 0);
+        finalPrice += price;
+        
+        const name = inp.parentElement.textContent.trim().replace(/\(\+S\/.[\d.]+\)/, '').trim(); 
+        
+        extras.push({
+            id: Number(inp.dataset.id || 0),
+            price: price,
+            group: inp.dataset.group || null,
+            name: name
+        });
+    });
+
+    const cartItem = {
+        temp_id: Date.now() + Math.random().toString(16).slice(2), 
+        product_id: product.id,
+        name: product.name,
+        // Obtiene la imagen del producto principal
+        image: product.image || 'img/placeholder.png', 
+        base_price: basePrice,
+        final_price: finalPrice, 
+        quantity: 1, 
+        extras
+    };
+
+    const cart = getCart();
+    cart.push(cartItem);
+    saveCart(cart);
+    
+    // Ocultar el detalle del producto y volver al catálogo
+    productDetailDiv.style.display = 'none';
+    catalogDiv.style.display       = 'block';
+
+    // Abrir el modal del carrito
+    openCartModal(); 
+}
 
 function openProductDetail(product, mode = 'burger') {
   const basePrice = Number(product.price);
@@ -271,43 +387,11 @@ function openProductDetail(product, mode = 'burger') {
 
     // Conectar botón "Agregar al carrito" también para postres
     console.log('openProductDetail ejecutado para:', product.name, 'modo:', mode);
-    addBtnDessert.onclick = null;
-    addBtnDessert.onclick = () => {
-      const selectedInputs = document.querySelectorAll(
-        '#product-detail input[type="checkbox"], #product-detail input[type="radio"]'
-      );
-
-      const extras = [];
-      let finalPrice = basePrice;
-
-      selectedInputs.forEach(inp => {
-        if (inp.checked) {
-          const price = Number(inp.dataset.price || 0);
-          finalPrice += price;
-          extras.push({
-            id:    Number(inp.dataset.id || 0),
-            price: price,
-            group: inp.dataset.group || null,
-            name:  inp.parentElement.textContent.trim()
-          });
-        }
-      });
-
-      const cartItem = {
-        product_id:  product.id,
-        name:        product.name,
-        base_price:  basePrice,
-        final_price: finalPrice,
-        extras
-      };
-
-      CART.push(cartItem);
-      if (cartCountSpan) cartCountSpan.textContent = String(CART.length);
-
-      productDetailDiv.style.display = 'none';
-      catalogDiv.style.display       = 'block';
-    };
-
+    const addBtnDessert = document.getElementById('add-to-cart-btn'); // Asume que es el mismo botón
+    if (addBtnDessert) {
+        // 🔥 Llamamos a la función auxiliar que maneja la lógica de adición y apertura del modal
+        addBtnDessert.onclick = () => addToCartHelper(product, basePrice);
+    }
     return;
   }
 
@@ -350,48 +434,144 @@ function openProductDetail(product, mode = 'burger') {
   const addBtn = document.getElementById('add-to-cart-btn');
   console.log('addBtn dentro de openProductDetail:', addBtn);
   if (!addBtn) return;
+  addBtn.onclick = () => addToCartHelper(product, basePrice);
+}
 
-  addBtn.onclick = () => {
-    console.log('CLICK EN AGREGAR CARRITO');
 
-    const selectedInputs = document.querySelectorAll(
-      '#product-detail input[type="checkbox"], #product-detail input[type="radio"]'
-    );
 
-    const extras = [];
-    let finalPrice = basePrice;
+function renderCartModal() {
+    console.log('renderCartModal, Renderizando con nuevo formato visual.');
+    const cart = getCart(); // 🔥 OBTENEMOS EL CARRITO PERSISTENTE
+    cartItemsDiv.innerHTML = '';
+    let grandTotal = 0;
 
-    selectedInputs.forEach(inp => {
-      if (inp.checked) {
-        const price = Number(inp.dataset.price || 0);
-        finalPrice += price;
-        extras.push({
-          id:    Number(inp.dataset.id || 0),
-          price: price,
-          group: inp.dataset.group || null,
-          name:  inp.parentElement.textContent.trim()
-        });
-      }
+    if (cart.length === 0) {
+        cartItemsDiv.innerHTML = '<p style="text-align:center;color:#999; padding: 20px;">Tu carrito está vacío</p>';
+        cartTotalSpan.textContent = '0.00';
+        return;
+    }
+    
+    // Encabezado con CSS Grid (5 columnas)
+    cartItemsDiv.innerHTML += `
+        <div style="display: grid; grid-template-columns: 1.5fr 3.5fr 80px 1fr 40px; gap: 10px; padding: 10px 0; border-bottom: 2px solid #ccc; font-weight: bold; background-color: #f7f7f7;">
+            <div style="padding-left: 10px;">Producto</div>
+            <div>Personalización</div>
+            <div style="text-align: center;">Cantidad</div>
+            <div style="text-align: right;">Subtotal</div>
+            <div></div>
+        </div>
+    `;
+
+    cart.forEach(item => {
+        const itemQuantity = item.quantity || 1;
+        const itemSubtotal = item.final_price * itemQuantity; 
+        grandTotal += itemSubtotal;
+
+        // Construye la lista de extras de personalización
+        const extrasNames = item.extras
+            .map(e => `<li>${e.name} (+S/.${Number(e.price).toFixed(2)})</li>`)
+            .join('');
+        
+        // Columna 2: Personalización
+        const personalizationDisplay = extrasNames.length > 0 ? 
+            `<ul style="margin: 0; padding-left: 15px; font-size: 0.9em; list-style-type: none;">${extrasNames}</ul>` : 
+            'Estándar / Sin extras';
+        
+        // Fila del ítem con la estructura de 5 columnas (El div principal es el contenedor Grid)
+        cartItemsDiv.innerHTML += `
+            <div class="carrito-item-row" style="display: grid; grid-template-columns: 1.5fr 3.5fr 80px 1fr 40px; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px dashed #eee;">
+                
+                <div class="carrito-producto" style="display: flex; align-items: center; gap: 10px; padding-left: 10px;">
+                    <img src="${item.image}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd;"> 
+                    <span style="font-weight: bold;">${item.name}</span>
+                </div>
+                
+                <div class="carrito-personalizacion">
+                    ${personalizationDisplay}
+                </div>
+                
+                <div class="carrito-cantidad" style="text-align: center;">
+                   <input type="number" 
+                        class="input-cantidad-carrito" 
+                        value="${itemQuantity}" 
+                        min="1"
+                        data-temp-id="${item.temp_id}" 
+                        style="width: 60px; text-align: center; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div class="subtotal" style="text-align: right; font-weight: bold;">
+                    S/.${itemSubtotal.toFixed(2)}
+                </div>
+                
+                <div class="eliminar-item" data-temp-id="${item.temp_id}" 
+                    style="cursor: pointer; font-weight: bold; color: #ff0000; text-align: center; font-size: 1.5em;">
+                    <span class="btn-eliminar-item" >&times;</span> 
+                </div>
+        `;
     });
 
-    const cartItem = {
-      product_id:  product.id,
-      name:        product.name,
-      base_price:  basePrice,
-      final_price: finalPrice,
-      extras
-    };
-
-CART.push(cartItem);
-console.log('CARRITO AHORA:', CART);
-
-if (cartCountSpan) {
-  cartCountSpan.textContent = String(CART.length);
-}
-  };
+    cartTotalSpan.textContent = grandTotal.toFixed(2);
 }
 
+// =================================================================
+// ⚡ NUEVA FUNCIÓN: Conexión de Eventos (Se llama inmediatamente después de renderizar)
+// =================================================================
 
+function attachCartListeners() {
+    // Usamos la variable global cartItemsDiv que ya existe para renderizar
+    if (cartItemsDiv) { 
+        console.log('✅ Intentando adjuntar listeners al carrito...');
+        
+        // Removemos listeners anteriores para evitar duplicados
+        // Nota: esto es una solución simplificada. Una implementación más limpia
+        // implicaría usar .cloneNode(true) en renderCartModal, pero esto funcionará.
+
+        // A. Manejar clics (para el botón 'X' de eliminar)
+        cartItemsDiv.addEventListener('click', (event) => {
+            // Buscamos el elemento que tenga la clase para eliminar
+            const targetElement = event.target.closest('.eliminar-item');
+            
+            if (targetElement) {
+                const temp_id = targetElement.dataset.tempId;
+                if (temp_id) {
+                    removeItemFromCart(temp_id); 
+                }
+            }
+        });
+
+        // B. Manejar cambios (para el input de cantidad)
+        cartItemsDiv.addEventListener('change', (event) => {
+            if (event.target.classList.contains('input-cantidad-carrito')) {
+                const temp_id = event.target.dataset.tempId;
+                const newQuantity = event.target.value;
+                
+                if (temp_id) {
+                    updateItemQuantity(temp_id, newQuantity); 
+                }
+            }
+        });
+        
+    } else {
+        console.error("❌ ERROR: cartItemsDiv es null en attachCartListeners.");
+    }
+}
+
+function openCartModal() {
+  renderCartModal();              // ← importante
+  cartModal.style.display = 'block';
+  attachCartListeners();
+}
+
+function closeCartModal() {
+  cartModal.style.display = 'none';
+}
+
+if (cartIconBtn)   cartIconBtn.onclick   = openCartModal;
+if (closeCartSpan) closeCartSpan.onclick = closeCartModal;
+
+window.addEventListener('click', (e) => {
+  if (e.target === cartModal) closeCartModal();
+});
 
 function createProductCard(product) {
   const card = document.createElement('div');
@@ -472,8 +652,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (roleElement) {
         roleElement.textContent = user.roles[0] ?? "Cliente";
-    }
+    }  
 });
+
+
+
+
+
+
+
+
+
+// -------------------------------------------------
+//    FUNCIONALIDADES NO INCLUYENTES AL PROCESO DE COMPRA
+// -------------------------------------------------
+
+
 
 // ✅Función para filtrar tarjetas por búsqueda
 function filterCards(query) {
@@ -539,52 +733,7 @@ function initCarousel(carouselId, visibleCount = 5) {
 
 
 
-function renderCartModal() {
-  console.log('renderCartModal, CART:', CART);
-  cartItemsDiv.innerHTML = '';
-  let total = 0;
 
-  if (!CART.length) {
-    cartItemsDiv.innerHTML = '<p style="text-align:center;color:#999;">Tu carrito está vacío</p>';
-    cartTotalSpan.textContent = '0.00';
-    return;
-  }
-
-  CART.forEach(item => {
-    total += item.final_price;
-
-    const div = document.createElement('div');
-    div.classList.add('carrito-item');
-    div.innerHTML = `
-      <p><strong>${item.name}</strong> - S/.${item.final_price.toFixed(2)}</p>
-      ${item.extras.length ? `
-        <ul>
-          ${item.extras.map(e => `<li>${e.name} (+S/.${e.price.toFixed(2)})</li>`).join('')}
-        </ul>
-      ` : '<p>Sin extras</p>'}
-      <hr>
-    `;
-    cartItemsDiv.appendChild(div);
-  });
-
-  cartTotalSpan.textContent = total.toFixed(2);
-}
-
-function openCartModal() {
-  renderCartModal();              // ← importante
-  cartModal.style.display = 'block';
-}
-
-function closeCartModal() {
-  cartModal.style.display = 'none';
-}
-
-if (cartIconBtn)   cartIconBtn.onclick   = openCartModal;
-if (closeCartSpan) closeCartSpan.onclick = closeCartModal;
-
-window.addEventListener('click', (e) => {
-  if (e.target === cartModal) closeCartModal();
-});
 
 // ✅=== INICIALIZAR ===
 document.addEventListener('DOMContentLoaded', () => {
@@ -1115,7 +1264,7 @@ function closeDrinkModal() {
   currentDrink = null;
 }
 
-drinkCancelBtn.onclick = closeDrinkModal;
+drinkCancelBtn.onclick = closeDrinkModal();
 
 drinkOkBtn.onclick = () => {
   if (!currentDrink) return;
@@ -1402,5 +1551,3 @@ if (desdeAdmin) {
   sessionStorage.removeItem('userRole');
   roleText = 'Cliente';
 }
-
-
