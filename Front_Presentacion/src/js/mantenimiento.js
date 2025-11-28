@@ -1,8 +1,7 @@
 /**
- * MANTENIMIENTO.JS - VERSIÓN BLINDADA
- * - URLs corregidas para Editar/Eliminar.
- * - Validación de IDs antes de enviar.
- * - Manejo específico de headers para evitar Error 500.
+ * MANTENIMIENTO.JS - VERSIÓN FINAL (VISUALIZACIÓN TEXTO/IMAGEN)
+ * - Mantiene lógica original de guardado.
+ * - Corrige visualización en tabla: Si no es URL, muestra texto.
  */
 
 // ==========================================
@@ -14,20 +13,20 @@ const API_CONFIG = {
     usuarios: {
         get:    `${API_BASE}/auth/management/users`,
         create: `${API_BASE}/auth/register`,
-        edit:   `${API_BASE}/auth/management/user-edit`, // ID va en URL dinámica
-        delete: `${API_BASE}/auth/management/user-delete`  // ID va en URL dinámica
+        edit:   `${API_BASE}/auth/management/user-edit`,
+        delete: `${API_BASE}/auth/management/user-delete`
     },
     productos: {
         get:    `${API_BASE}/auth/products`,
         create: `${API_BASE}/auth/products`,
-        edit:   `${API_BASE}/auth/products`, // ID va en URL dinámica
-        delete: `${API_BASE}/auth/products`  // ID va en URL dinámica
+        edit:   `${API_BASE}/auth/products`,
+        delete: `${API_BASE}/auth/products`
     },
     categorias: {
         get:    `${API_BASE}/auth/categories`,
         create: `${API_BASE}/auth/categories`,
-        edit:   `${API_BASE}/auth/categories`, // ID va en URL dinámica
-        delete: `${API_BASE}/auth/categories`  // ID va en URL dinámica
+        edit:   `${API_BASE}/auth/categories`,
+        delete: `${API_BASE}/auth/categories`
     }
 };
 
@@ -38,16 +37,16 @@ let rawData = {
 };
 
 // ==========================================
-// 2. CONFIGURACIÓN DE TABLAS (HEADERS)
+// 2. CONFIGURACIÓN DE TABLAS
 // ==========================================
 const headers = {
     usuarios:   ['ID', 'Email', 'Nombres', 'Apellidos', 'Password', 'Doc Type', 'Nro Doc', 'Creado'],
-    productos:  ['ID', 'Nombre', 'Categoría ID', 'Precio', 'Stock', 'Imagen', 'Creado'],
-    categorias: ['ID', 'Nombre', 'Descripción', 'Creado']
+    productos:  ['ID', 'Nombre', 'Cat. ID', 'Descripción', 'Precio', 'Stock', 'Imagen', 'Creado'],
+    categorias: ['ID', 'Nombre', 'Descripción']
 };
 
 // ==========================================
-// 3. CONFIGURACIÓN DE FORMULARIOS (SCHEMAS)
+// 3. CONFIGURACIÓN DE FORMULARIOS
 // ==========================================
 const schemas = {
     usuarios: [
@@ -61,10 +60,11 @@ const schemas = {
     productos: [
         { key:'name', label:'Nombre Producto', type:'text', required:true },
         { key:'category_id', label:'ID Categoría', type:'number', required:true },
+        { key:'description', label:'Descripción', type:'text' },
         { key:'price', label:'Precio', type:'number', step:'0.01', required:true },
         { key:'stock', label:'Stock', type:'number', required:true },
-        { key:'description', label:'Descripción', type:'text' },
-        { key:'image', label:'URL Imagen', type:'text' }
+        // Input File + Texto
+        { key:'image', label:'Imagen (URL o Archivo)', type:'file' }
     ],
     categorias: [
         { key:'name', label:'Nombre Categoría', type:'text', required:true },
@@ -83,8 +83,9 @@ function getKeyFromHeader(h){
     const m = { 
         'ID':'id', 'Email':'email', 'Nombres':'first_name', 'Apellidos':'last_name', 'Password':'password',
         'Doc Type':'document_type_id', 'Nro Doc':'nro_document', 
-        'Nombre':'name', 'Categoría ID':'category_id', 'Precio':'price', 'Stock':'stock', 
-        'Descripción':'description', 'Imagen':'image', 'URL Imagen':'image', 
+        'Nombre':'name', 'Cat. ID':'category_id', 'Categoría ID':'category_id',
+        'Descripción':'description', 'Precio':'price', 'Stock':'stock', 
+        'Imagen':'image', 'URL Imagen':'image', 
         'Creado':'created_at' 
     }; 
     return m[h]||h.toLowerCase(); 
@@ -97,8 +98,21 @@ function getDisplayName(r){
     return r.id;
 }
 
+// Helper global para input file
+window.updateImagePath = function(input, keyName) {
+    if (input.files && input.files[0]) {
+        const fileName = input.files[0].name;
+        const newPath = `img/productos/${fileName}`;
+        const textInput = document.getElementById(`path_${keyName}`);
+        if(textInput) {
+            textInput.value = newPath;
+            textInput.dispatchEvent(new Event('input'));
+        }
+    }
+};
+
 // ==========================================
-// 5. LÓGICA API (CRUD BLINDADO)
+// 5. LÓGICA API
 // ==========================================
 
 async function cargarDatosAPI(tabla) {
@@ -123,7 +137,6 @@ async function cargarDatosAPI(tabla) {
         else if (Array.isArray(data)) rawData[tabla] = data;
         else rawData[tabla] = []; 
 
-        console.log(`Datos ${tabla}:`, rawData[tabla]);
         renderMantenimientoTable(tabla);
 
     } catch (e) {
@@ -138,18 +151,12 @@ async function crudAPI(action, payload, id = null) {
     let url, method;
 
     try {
-        // 1. Validación de ID
-        if ((action === 'edit' || action === 'delete') && !id) {
-            throw new Error("ID no válido para esta operación.");
-        }
+        if ((action === 'edit' || action === 'delete') && !id) throw new Error("ID inválido.");
 
-        // 2. Construcción de URL
         if (action === 'create') {
             url = config.create;
             method = 'POST';
         } else if (action === 'edit') {
-            // Usuarios tiene una ruta especial para editar /user-edit/ID
-            // Productos y Categorias son /products/ID y /categories/ID
             url = currentTable === 'usuarios' ? `${config.edit}/${id}` : `${config.edit}/${id}`;
             method = 'PUT';
         } else if (action === 'delete') {
@@ -157,31 +164,23 @@ async function crudAPI(action, payload, id = null) {
             method = 'DELETE';
         }
 
-        console.log(`📡 ${method} -> ${url}`); // Debug
-
-        // 3. Headers (Truco para evitar Error 500 en DELETE)
         const headers = { 'Authorization': `Bearer ${token}` };
         const options = { method, headers };
 
-        // Solo enviamos JSON si NO es delete
         if (action !== 'delete') {
             headers['Content-Type'] = 'application/json';
             if (payload) options.body = JSON.stringify(payload);
         }
 
-        // 4. Petición
         const response = await fetch(url, options);
         
-        // 5. Manejo de Respuesta
         if (!response.ok) {
-            // Intentamos leer JSON de error
             const contentType = response.headers.get("content-type");
             if (contentType && contentType.indexOf("application/json") !== -1) {
                 const err = await response.json();
                 throw new Error(err.message || err.msg || "Error API");
             } else {
-                // Si es HTML (Error 500)
-                if(response.status === 500) throw new Error("Error Interno del Servidor (500). Verifica datos o dependencias.");
+                if(response.status === 500) throw new Error("Error 500 del Servidor.");
                 throw new Error(`Error HTTP ${response.status}`);
             }
         }
@@ -215,16 +214,12 @@ function renderMantenimientoTable(tableKey){
     let colLabels = headers[tableKey] || [];
     let colKeys = colLabels.map(h => getKeyFromHeader(h));
 
-    // Header
     headerRow.innerHTML = '';
     colLabels.forEach(h => { 
-        const th = document.createElement('th'); 
-        th.textContent = h; 
-        headerRow.appendChild(th); 
+        const th = document.createElement('th'); th.textContent = h; headerRow.appendChild(th); 
     });
     headerRow.innerHTML += '<th>Acciones</th>';
     
-    // Body
     tbody.innerHTML = '';
     const data = rawData[tableKey] || [];
 
@@ -239,27 +234,46 @@ function renderMantenimientoTable(tableKey){
             const td = document.createElement('td'); 
             let val = row[key];
             
-            // Formateo
-            if (val === undefined || val === null) val = '-';
-            else if (key === 'password') val = '••••••'; 
-            else if (key === 'price') val = `S/ ${parseFloat(val).toFixed(2)}`;
-            else if (key === 'image') {
-                if(val.startsWith('http')) val = `<img src="${val}" alt="img" style="width:30px; height:30px; object-fit:cover; border-radius:4px;">`;
-                else val = val.substring(0, 15) + '...';
+            // --- FORMATO ---
+            if (val === undefined || val === null) {
+                val = '-';
+            } 
+            else if (key === 'password') {
+                val = '••••••'; 
             }
-            else if (key === 'created_at' || key === 'createdAt') { 
+            else if (key === 'price') {
+                val = `S/ ${parseFloat(val).toFixed(2)}`;
+            }
+            
+            // ✅ IMAGEN: Muestra foto si es URL, texto si no lo es
+            else if (key === 'image') {
+                if (val.toString().startsWith('http')) {
+                    val = `<img src="${val}" alt="img" 
+                           style="width:50px; height:50px; object-fit:cover; border-radius:4px; border:1px solid #ccc;" 
+                           onerror="this.outerHTML='<span style=\'font-size:0.8em; color:red\'>Link Roto</span>';">`;
+                } 
+                else {
+                    // Muestra el texto tal cual (ej: "hola11")
+                    val = `<span style="font-family:monospace; color:#555; font-size:0.9em;">${val}</span>`;
+                }
+            }
+            
+            else if (key === 'description') {
+                if (val.length > 35) val = `<span title="${val}">${val.substring(0, 32)}...</span>`;
+            }
+            else if (key === 'created_at') { 
                 try { 
                     const d = new Date(val);
-                    if(!isNaN(d)) val = d.toLocaleDateString('es-PE');
+                    if(!isNaN(d.getTime())) val = d.toLocaleDateString('es-PE');
                 } catch(e){}
             }
 
-            if(key === 'image') td.innerHTML = val;
+            if(key === 'image' || key === 'description') td.innerHTML = val;
             else td.textContent = val; 
+            
             tr.appendChild(td); 
         });
         
-        // Botones
         const tdActions = document.createElement('td');
         tdActions.className = "action-cell";
         
@@ -275,10 +289,8 @@ function renderMantenimientoTable(tableKey){
             if(confirm(`¿Eliminar ${getDisplayName(row)}?`)) crudAPI('delete', null, row.id);
         };
         
-        tdActions.appendChild(edit); 
-        tdActions.appendChild(del); 
-        tr.appendChild(tdActions); 
-        tbody.appendChild(tr);
+        tdActions.appendChild(edit); tdActions.appendChild(del); 
+        tr.appendChild(tdActions); tbody.appendChild(tr);
     });
 }
 
@@ -308,7 +320,6 @@ function openModal(mode, id=null){
     
     let record = {};
     if(mode==='edit') {
-        // Buscamos en rawData usando el ID como número o string (seguro)
         record = rawData[currentTable].find(r => r.id == id) || {};
     }
     
@@ -324,7 +335,24 @@ function openModal(mode, id=null){
             isRequired = false;
         }
 
-        div.innerHTML = `<label>${f.label}${isRequired? ' *':''}</label><input type="${f.type}" name="${f.key}" class="form-control" value="${val}" ${isRequired? 'required':''} ${f.step? `step="${f.step}"` : ''}>`;
+        // Input File + Texto Editable
+        if (f.type === 'file') {
+            div.innerHTML = `
+                <label>${f.label}</label>
+                <input type="file" class="form-control" accept="image/*" 
+                       onchange="updateImagePath(this, '${f.key}')"
+                       style="margin-bottom: 5px;">
+                
+                <input type="text" id="path_${f.key}" name="${f.key}" class="form-control" value="${val}" 
+                       placeholder="Escribe la URL o selecciona un archivo..." 
+                       style="background:#fff; color:#333; border:1px solid #bbb;">
+                <small style="color:#666; font-size:0.8em;">* Edita el texto libremente o selecciona un archivo.</small>
+            `;
+        } 
+        else {
+            div.innerHTML = `<label>${f.label}${isRequired? ' *':''}</label><input type="${f.type}" name="${f.key}" class="form-control" value="${val}" ${isRequired? 'required':''} ${f.step? `step="${f.step}"` : ''}>`;
+        }
+
         form.appendChild(div);
     });
     
@@ -343,18 +371,33 @@ async function handleModalSave(e){
     const form = document.getElementById('crudForm'); if(!form) return;
     
     const mode = form.dataset.mode; 
-    const editId = form.dataset.editId; // Lo dejamos como string o int, lo validamos luego
+    const editId = form.dataset.editId;
     const inputs = form.querySelectorAll('input'); 
     const entry = {}; 
     
-    inputs.forEach(i => entry[i.name] = i.value);
+    // ✅ Captura TODOS los inputs con 'name' (incluyendo el texto de imagen)
+    inputs.forEach(i => {
+        if(i.name) {
+            entry[i.name] = i.value;
+        }
+    });
     
-    // Conversiones
+    // --- LIMPIEZA ---
     if (entry.password === "") delete entry.password;
     if (entry.price) entry.price = parseFloat(entry.price);
     if (entry.stock) entry.stock = parseInt(entry.stock);
     if (entry.category_id) entry.category_id = parseInt(entry.category_id);
     if (entry.document_type_id) entry.document_type_id = parseInt(entry.document_type_id);
 
+    // Imagen: Solo enviamos null si está vacío
+    if (currentTable === 'productos') {
+        if (!entry.image || entry.image.trim() === "") {
+            entry.image = null;
+        } else {
+            entry.image = entry.image.trim();
+        }
+    }
+
+    console.log("🚀 Enviando:", entry);
     await crudAPI(mode, entry, editId);
 }

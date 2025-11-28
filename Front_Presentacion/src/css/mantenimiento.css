@@ -4,27 +4,101 @@
 
 /* --- BOTONES Y ACCIONES --- */
 /* Estos botones son genéricos y seguros de compartir */
-.btn { padding: 8px 14px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 0.875rem; transition: opacity 0.2s; }
-.btn:hover { opacity: 0.9; }
+.btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: opacity 0.2s;
+}
 
-.btn-primary { background: #3b82f6; color: white; } /* Azul */
-.btn-warning { background: #f59e0b; color: white; } /* Naranja (Editar) */
-.btn-danger { background: #ef4444; color: white; }  /* Rojo (Eliminar/Logout) */
-.btn-secondary { background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; } /* Botón Cancelar */
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+/* Azul */
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+}
+
+/* Naranja (Editar) */
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+/* Rojo (Eliminar/Logout) */
+.btn-secondary {
+    background: #f1f5f9;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+}
+
+/* Botón Cancelar */
 
 /* --- BUSCADOR Y CABECERA --- */
-.search-and-add { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 16px; }
-.search-box { padding: 8px 16px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; flex: 1; max-width: 300px; }
-.btn-add { white-space: nowrap; }
+.search-and-add {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 16px;
+}
+
+.search-box {
+    padding: 8px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    flex: 1;
+    max-width: 300px;
+}
+
+.btn-add {
+    white-space: nowrap;
+}
 
 /* --- TABLAS CRUD --- */
 /* Usamos selectores específicos para no afectar otras tablas si las hubiera */
-.data-card table { width: 100%; border-collapse: collapse; }
-.data-card th, .data-card td { padding: 16px 20px; text-align: left; }
-.data-card th { background-color: #f8fafc; font-weight: 600; color: #475569; font-size: 0.9rem; }
-.data-card td { border-top: 1px solid #e2e8f0; color: #1e293b; }
-.data-card tr:hover td { background-color: #f8fafc; }
-.action-cell { display: flex; gap: 10px; }
+.data-card table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-card th,
+.data-card td {
+    padding: 16px 20px;
+    text-align: left;
+}
+
+.data-card th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.data-card td {
+    border-top: 1px solid #e2e8f0;
+    color: #1e293b;
+}
+
+.data-card tr:hover td {
+    background-color: #f8fafc;
+}
+
+.action-cell {
+    display: flex;
+    gap: 10px;
+}
 
 /* ==========================================================================
    🔴 SOLUCIÓN DEL CONFLICTO: ESTILOS ESPECÍFICOS PARA EL MODAL CRUD
@@ -32,43 +106,96 @@
    ========================================================================== */
 
 /* El overlay específico del CRUD */
-#crudModal.modal-overlay { 
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(0, 0, 0, 0.5); 
-    display: flex; justify-content: center; align-items: center; 
-    z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; 
+#crudModal.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
 }
-#crudModal.modal-overlay.active { opacity: 1; visibility: visible; }
+
+#crudModal.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
 
 /* El diseño de la caja del modal CRUD (Más grande que el de Logout) */
-#crudModal .modal { 
-    background: white; 
-    width: 90%; 
-    max-width: 500px; /* Ancho específico para formularios */
-    border-radius: 16px; 
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); 
-    transform: translateY(-20px); 
-    transition: transform 0.3s ease; 
+#crudModal .modal {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    /* Ancho específico para formularios */
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
 }
-#crudModal.modal-overlay.active .modal { transform: translateY(0); }
+
+#crudModal.modal-overlay.active .modal {
+    transform: translateY(0);
+}
 
 /* Cabecera interna del CRUD */
-#crudModal .modal-header { padding: 24px 24px 12px; }
-#crudModal .modal-header h3 { font-size: 1.3rem; font-weight: 600; color: #1e293b; }
+#crudModal .modal-header {
+    padding: 24px 24px 12px;
+}
+
+#crudModal .modal-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1e293b;
+}
 
 /* Cuerpo del CRUD */
-#crudModal .modal-body { padding: 0 24px 24px; }
+#crudModal .modal-body {
+    padding: 0 24px 24px;
+}
 
 /* Footer del CRUD */
-#crudModal .modal-footer { display: flex; justify-content: flex-end; gap: 12px; padding: 0 24px 24px; }
+#crudModal .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 0 24px 24px;
+}
 
 /* --- FORMULARIOS INTERNOS --- */
-.form-group { margin-bottom: 20px; }
-.form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #334155; }
-.form-control { width: 100%; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; }
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #334155;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 1rem;
+}
 
 /* Responsive para búsqueda */
 @media (max-width: 768px) {
-    .search-and-add { flex-direction: column; align-items: stretch; }
-    .btn-add { align-self: flex-end; width: auto; }
+    .search-and-add {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-add {
+        align-self: flex-end;
+        width: auto;
+    }
 }

@@ -1,0 +1,286 @@
+/* === REPORTE PRODUCTOS POPULARES (Prefijo: rpp-) === */
+#reporte-productos-populares .rpp-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#reporte-productos-populares .rpp-header {
+    background: white;
+    padding: 15px 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 5px solid #2563eb;
+}
+
+#reporte-productos-populares .rpp-header h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+    color: #2563eb;
+}
+
+#reporte-productos-populares .rpp-subtitle {
+    margin: 5px 0 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+#reporte-productos-populares .rpp-pdf-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#reporte-productos-populares .rpp-pdf-info {
+    font-size: 12px;
+    color: #64748b;
+    font-style: italic;
+    text-align: right;
+}
+
+#reporte-productos-populares .rpp-btn-pdf {
+    background: white;
+    color: #0f172a;
+    border: 1px solid #0f172a;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-weight: bold;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#reporte-productos-populares .rpp-btn-pdf:hover {
+    background: #f8fafc;
+}
+
+#reporte-productos-populares .rpp-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+#reporte-productos-populares .rpp-kpi-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    position: relative;
+    border-left: 4px solid #2563eb;
+}
+
+#reporte-productos-populares .rpp-kpi-title {
+    font-size: 11px;
+    font-weight: bold;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#reporte-productos-populares .rpp-kpi-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 8px;
+    color: #2563eb;
+}
+
+#reporte-productos-populares .rpp-kpi-value-text {
+    font-size: 18px;
+    line-height: 1.4;
+    color: #0f172a;
+    margin-top: 8px;
+    font-weight: bold;
+}
+
+#reporte-productos-populares .rpp-kpi-subtext {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: bold;
+}
+
+#reporte-productos-populares .rpp-controls-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+    border: 1px solid #ccc;
+}
+
+#reporte-productos-populares .rpp-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#reporte-productos-populares .rpp-control-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+#reporte-productos-populares input[type="date"],
+#reporte-productos-populares select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    min-width: 140px;
+}
+
+#reporte-productos-populares .rpp-btn-group {
+    display: flex;
+    gap: 5px;
+}
+
+#reporte-productos-populares .rpp-btn {
+    padding: 8px 14px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+#reporte-productos-populares .rpp-btn:hover {
+    background: #f1f5f9;
+    color: #2563eb;
+    border-color: #2563eb;
+}
+
+#reporte-productos-populares .rpp-btn.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+#reporte-productos-populares .rpp-btn-apply-container {
+    flex-grow: 1;
+}
+
+#reporte-productos-populares .rpp-btn-apply {
+    width: 100%;
+    background: #2563eb;
+    color: white;
+    border: none;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+#reporte-productos-populares .rpp-btn-apply:hover {
+    background: #1d4ed8;
+}
+
+#reporte-productos-populares .rpp-table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    overflow: hidden;
+}
+
+#reporte-productos-populares .rpp-table-scroll {
+    overflow-y: auto;
+    overflow-x: auto;
+    max-height: 500px;
+    width: 100%;
+}
+
+#reporte-productos-populares table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+#reporte-productos-populares thead {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    z-index: 10;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+#reporte-productos-populares th {
+    padding: 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: bold;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+#reporte-productos-populares td {
+    padding: 12px 14px;
+    font-size: 13px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #0f172a;
+    vertical-align: middle;
+}
+
+#reporte-productos-populares tr:hover {
+    background-color: #f8fafc;
+}
+
+#reporte-productos-populares .rank-cell {
+    font-weight: bold;
+    color: #64748b;
+    font-size: 14px;
+    width: 50px;
+    text-align: center;
+}
+
+#reporte-productos-populares .rank-1 {
+    color: #d97706;
+    font-size: 18px;
+}
+
+#reporte-productos-populares .rank-2 {
+    color: #94a3b8;
+    font-size: 16px;
+}
+
+#reporte-productos-populares .rank-3 {
+    color: #b45309;
+    font-size: 16px;
+}
+
+#reporte-productos-populares .popularity-container {
+    width: 100%;
+    background-color: #e2e8f0;
+    border-radius: 4px;
+    height: 8px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+
+#reporte-productos-populares .popularity-fill {
+    height: 100%;
+    background-color: #2563eb;
+    border-radius: 4px;
+}
