@@ -1,38 +1,45 @@
+// js/dashboard.js
+
 // ==========================================
 // 1. VARIABLES Y DATOS (Globales)
 // ==========================================
-const getDbLocalISO = d => { const z = d.getTimezoneOffset() * 60000; return new Date(d - z).toISOString().split('T')[0]; };
-const getDbDaysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return getDbLocalISO(d); };
 
+const getDbLocalISO = (d) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+const getDbDaysAgo = (n) => { 
+    const d = new Date(); 
+    d.setDate(d.getDate() - n); 
+    return getDbLocalISO(d); 
+};
+
+// DATOS DE PRUEBA DIVERSOS
 const dbRawData = [
+  // Hoy
   { product: "Hamburguesa Royal", category: "Hamburguesas", price: 25, qty: 5, date: getDbDaysAgo(0) },
   { product: "Inka Cola 500ml", category: "Bebidas", price: 5, qty: 15, date: getDbDaysAgo(0) },
-  { product: "Hamburguesa Doble", category: "Hamburguesas", price: 28, qty: 10, date: getDbDaysAgo(1) },
-  { product: "Coca Cola 1L", category: "Bebidas", price: 9, qty: 12, date: getDbDaysAgo(1) },
-  { product: "Alitas BBQ", category: "Acompañamientos", price: 35, qty: 4, date: getDbDaysAgo(1) },
+  // Hace 2 días
   { product: "Hamburguesa Clásica", category: "Hamburguesas", price: 18, qty: 20, date: getDbDaysAgo(2) },
   { product: "Nuggets x6", category: "Acompañamientos", price: 12, qty: 20, date: getDbDaysAgo(2) },
-  { product: "Limonada", category: "Bebidas", price: 10, qty: 15, date: getDbDaysAgo(3) },
-  { product: "Torta Chocolate", category: "Postres", price: 10, qty: 5, date: getDbDaysAgo(4) },
-  { product: "Hamburguesa Vegana", category: "Hamburguesas", price: 24, qty: 4, date: getDbDaysAgo(5) },
-  { product: "Hamburguesa Royal", category: "Hamburguesas", price: 25, qty: 25, date: getDbDaysAgo(6) },
-  { product: "Salchipapa", category: "Acompañamientos", price: 14, qty: 40, date: getDbDaysAgo(7) },
-  { product: "Hamburguesa Parrillera", category: "Hamburguesas", price: 30, qty: 10, date: getDbDaysAgo(12) },
+  // Hace 5 días
+  { product: "Limonada", category: "Bebidas", price: 10, qty: 15, date: getDbDaysAgo(5) },
+  // Hace 15 días (Mes)
   { product: "Chicha Morada", category: "Bebidas", price: 12, qty: 30, date: getDbDaysAgo(15) },
-  { product: "Milkshake Fresa", category: "Postres", price: 15, qty: 10, date: getDbDaysAgo(20) },
-  { product: "Papas Fritas", category: "Acompañamientos", price: 10, qty: 50, date: getDbDaysAgo(28) },
-  { product: "Hamburguesa Doble", category: "Hamburguesas", price: 28, qty: 15, date: getDbDaysAgo(45) },
-  { product: "Cerveza Artesanal", category: "Bebidas", price: 15, qty: 20, date: getDbDaysAgo(60) }
+  // Hace 45 días (Año)
+  { product: "Hamburguesa Doble", category: "Hamburguesas", price: 28, qty: 15, date: getDbDaysAgo(45) }
 ];
 
 let dbCharts = {};
 
 // ==========================================
-// 2. FUNCIONES (Asignadas directamente a window)
+// 2. FUNCIONES
 // ==========================================
 
 window.setDbPreset = function(t) {
-  // Manejo de botones activos
   const btns = document.querySelectorAll('.db-btn-preset');
   btns.forEach(b => b.classList.remove('active'));
   
@@ -40,11 +47,27 @@ window.setDbPreset = function(t) {
   if(activeBtn) activeBtn.classList.add('active');
 
   const today = new Date();
-  let s = getDbLocalISO(today), e = getDbLocalISO(today);
+  let s = "", e = "";
   
-  if(t==='week') s = getDbDaysAgo(6);
-  if(t==='month') { const d = new Date(); d.setDate(1); s = getDbLocalISO(d); }
-  if(t==='year') { const d = new Date(); d.setMonth(0); d.setDate(1); s = getDbLocalISO(d); }
+  if (t === 'today') {
+    s = getDbLocalISO(today);
+    e = getDbLocalISO(today);
+  } else if (t === 'week') {
+    const start = new Date();
+    start.setDate(today.getDate() - 6);
+    s = getDbLocalISO(start);
+    e = getDbLocalISO(today);
+  } else if (t === 'month') {
+    const start = new Date(today.getFullYear(), today.getMonth(), 1);
+    const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    s = getDbLocalISO(start);
+    e = getDbLocalISO(end);
+  } else if (t === 'year') {
+    const start = new Date(today.getFullYear(), 0, 1);
+    const end = new Date(today.getFullYear(), 11, 31);
+    s = getDbLocalISO(start);
+    e = getDbLocalISO(end);
+  }
   
   const sInput = document.getElementById('db-start-date');
   const eInput = document.getElementById('db-end-date');
@@ -52,7 +75,7 @@ window.setDbPreset = function(t) {
   if(sInput && eInput) {
       sInput.value = s;
       eInput.value = e;
-      window.updateDashboard(); // Llamada directa
+      window.updateDashboard(); 
   }
 };
 
@@ -62,6 +85,7 @@ window.checkInventoryCount = function() {
   const THRESHOLD = 10; 
 
   uniqueProds.forEach(p => {
+    // Simulación random de stock para el dashboard
     const simStock = Math.floor(Math.random() * 25); 
     if(simStock < THRESHOLD) lowStockCount++;
   });
@@ -99,7 +123,6 @@ window.updateDashboard = function() {
   const sInput = document.getElementById('db-start-date');
   const eInput = document.getElementById('db-end-date');
   
-  // Seguridad si los inputs no existen aún
   if(!sInput || !eInput) return;
 
   const s = sInput.value;
@@ -113,7 +136,6 @@ window.updateDashboard = function() {
   const rev = data.reduce((a,c) => a + (c.qty*c.price), 0);
   const ticket = data.length ? rev/data.length : 0;
   
-  // Actualizar DOM solo si los elementos existen
   const elTotal = document.getElementById('db-kpi-total');
   const elOrders = document.getElementById('db-kpi-orders');
   const elTicket = document.getElementById('db-kpi-ticket');
@@ -132,7 +154,9 @@ window.updateDashboard = function() {
     dateMap[i.date] = (dateMap[i.date] || 0) + v;
   });
 
-  const trendData = fullDateRange.map(date => dateMap[date] || 0);
+  // Si el rango es muy grande (Año), no mostramos todos los días, agrupamos visualmente
+  let trendLabels = fullDateRange;
+  let trendValues = fullDateRange.map(date => dateMap[date] || 0);
 
   const catMap = {};
   data.forEach(i => {
@@ -147,7 +171,7 @@ window.updateDashboard = function() {
   });
   const topProds = Object.entries(prodMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
 
-  window.renderDbCharts(fullDateRange, trendData, cats, catVals, topProds.map(x=>x[0]), topProds.map(x=>x[1]));
+  window.renderDbCharts(trendLabels, trendValues, cats, catVals, topProds.map(x=>x[0]), topProds.map(x=>x[1]));
 };
 
 window.renderDbCharts = function(trendLabels, trendValues, catLabels, catValues, prods, prodVals) {
@@ -168,8 +192,7 @@ window.renderDbCharts = function(trendLabels, trendValues, catLabels, catValues,
             borderWidth: 2,
             fill: true, 
             tension: 0.3, 
-            pointRadius: 3,
-            pointBackgroundColor: '#2563eb'
+            pointRadius: 3
           }]
         },
         options: { 
@@ -210,19 +233,18 @@ window.renderDbCharts = function(trendLabels, trendValues, catLabels, catValues,
   }
 };
 
-// Función de inicialización segura
+// Inicialización segura al cargar
 window.initDashboard = function() {
     setTimeout(() => {
-        const btnToday = document.getElementById('db-btn-today');
-        if(btnToday) {
-            window.setDbPreset('today'); 
+        if(document.getElementById('db-btn-month')) {
+            window.setDbPreset('month'); 
         }
     }, 100);
 };
 
-// Auto-inicializar si ya estamos en la vista (por si acaso)
+// Auto-arranque
 document.addEventListener('DOMContentLoaded', () => {
-    if(document.getElementById('db-btn-today')) {
-        window.setDbPreset('today');
+    if(document.getElementById('db-btn-month')) {
+        window.setDbPreset('month');
     }
 });

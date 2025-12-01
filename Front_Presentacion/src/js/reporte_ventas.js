@@ -1,8 +1,18 @@
 // js/reporte_ventas.js
 
-// 1. Variables Globales
-const getRvLocalISO = d => { const z = d.getTimezoneOffset() * 60000; return new Date(d - z).toISOString().split('T')[0]; };
-const getRvDaysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return getRvLocalISO(d); };
+// 1. Variables Globales y Helpers de Fecha
+const getRvLocalISO = (d) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+const getRvDaysAgo = (n) => { 
+    const d = new Date(); 
+    d.setDate(d.getDate() - n); 
+    return getRvLocalISO(d); 
+};
 
 const rvRawData = [
   { id: 1, product: "Hamburguesa Royal", customization: "Estándar", category: "Hamburguesas", price: 25.00, qty: 2, date: getRvDaysAgo(0) },
@@ -29,40 +39,56 @@ const rvRawData = [
 let rvCurrentFilteredData = [];
 const formatRvCurrency = (num) => `S/. ${num.toFixed(2)}`;
 
-// 2. Funciones Globales
+// 2. Funciones Globales (Filtros de Fecha Corregidos)
 window.setRvPreset = function(type) {
+  // UI: Actualizar botones activos
   const btns = document.querySelectorAll('.rv-btn');
   btns.forEach(b => b.classList.remove('active'));
-  
   const btn = document.getElementById(`rv-btn-${type}`);
   if(btn) btn.classList.add('active');
 
   const today = new Date();
   let startStr = "", endStr = "";
 
+  // ✅ CORRECCIÓN: Usamos First Day y Last Day para que el rango sea visualmente correcto
   if (type === 'today') {
     startStr = getRvLocalISO(today);
     endStr = getRvLocalISO(today);
-  } else if (type === 'week') {
-    const start = new Date(today);
-    start.setDate(today.getDate() - 6);
+  } 
+  else if (type === 'week') {
+    // Últimos 7 días
+    const start = new Date();
+    start.setDate(today.getDate() - 6); 
     startStr = getRvLocalISO(start);
     endStr = getRvLocalISO(today);
-  } else if (type === 'month') {
+  } 
+  else if (type === 'month') {
+    // ✅ MES COMPLETO (1 al 30/31)
+    // Primer día del mes
     const start = new Date(today.getFullYear(), today.getMonth(), 1);
+    // Último día del mes (truco: día 0 del mes siguiente)
+    const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
     startStr = getRvLocalISO(start);
-    endStr = getRvLocalISO(today);
-  } else if (type === 'year') {
-    const start = new Date(today.getFullYear(), 0, 1);
+    endStr = getRvLocalISO(end);
+  } 
+  else if (type === 'year') {
+    // ✅ AÑO COMPLETO (Ene 1 a Dic 31)
+    const start = new Date(today.getFullYear(), 0, 1); // 1 Enero
+    const end = new Date(today.getFullYear(), 11, 31); // 31 Diciembre
+    
     startStr = getRvLocalISO(start);
-    endStr = getRvLocalISO(today);
+    endStr = getRvLocalISO(end);
   }
 
+  // Aplicar valores a los inputs
   const sInput = document.getElementById('rv-start-date');
   const eInput = document.getElementById('rv-end-date');
+  
   if(sInput && eInput) {
       sInput.value = startStr;
       eInput.value = endStr;
+      // Disparar filtro
       window.applyRvFilters();
   }
 };
@@ -246,7 +272,7 @@ window.generateSalesPDF = function() {
   doc.save('Reporte_Ventas_MiBarrio.pdf');
 };
 
-// Inicialización externa
+// Inicialización externa (Carga por defecto HOY)
 window.initReporteVentas = function() {
     setTimeout(() => {
         if(document.getElementById('rv-btn-today')) {
