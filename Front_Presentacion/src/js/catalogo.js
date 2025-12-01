@@ -8,7 +8,6 @@ const cartTotalSpan = document.getElementById('total-general');
 const closeCartSpan = document.getElementById('cerrarModalCarrito');
 const cartIconBtn   = document.getElementById('carrito-container');
 
-
 function initDrinkOptions() {
   DRINK_OPTIONS = ALL_PRODUCTS.filter(p => Number(p.category_id) === 9);
 }
@@ -19,6 +18,27 @@ const detailPrice       = document.getElementById('detail-price');
 let carrito = JSON.parse(sessionStorage.getItem('carrito')) || [];
 // Parámetros de URL (global para evitar ReferenceError cuando se usan fuera de DOMContentLoaded)
 const urlParams = new URLSearchParams(window.location.search);
+
+document.addEventListener('DOMContentLoaded', () => {
+  const vista = sessionStorage.getItem('vista-actual');
+  if (vista === 'seguimiento') {
+    mostrarSeguimiento();
+  } else {
+    mostrarCatalogo();
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ✅=== FUNCIONES EXISTENTES (NO MODIFICADAS) ===
 // ✅Función para mostrar secciones del catálogo
@@ -39,6 +59,22 @@ function showSection(sectionId) {
     }
   }
   currentFilter = sectionId;
+}
+
+function getProductImageUrl(product) {
+  const img = product?.image;
+  if (!img) return 'img/placeholder.png';
+
+  // Si ya es URL completa
+  if (img.startsWith('http')) return img;
+
+  // Si empieza con "uploads/" o "/uploads/", solo agrega dominio
+  if (img.startsWith('uploads/') || img.startsWith('/uploads/')) {
+    return 'http://burger-api-sandbox.com/' + img.replace(/^\/+/, '');
+  }
+
+  // Si solo es nombre de archivo (caso futuro)
+  return 'http://burger-api-sandbox.com/uploads/products/' + img;
 }
 
 const API_URL = 'http://burger-api-sandbox.com/auth/products';
@@ -296,7 +332,7 @@ function openProductDetail(product, mode = 'burger') {
   const basePrice = Number(product.price);
 
   detailTitle.textContent       = product.name;
-  detailImage.src               = product.image || 'img/placeholder.png';
+  detailImage.src               = getProductImageUrl(product);
   detailImage.alt               = product.name;
   detailDescription.textContent = product.description || '';
   detailPrice.textContent       = `Precio: S/.${basePrice.toFixed(2)}`;
@@ -611,25 +647,27 @@ function createProductCard(product) {
 
   card.productData = product;
 
+  const imgUrl = getProductImageUrl(product);
+
   card.innerHTML = `
-    <img src="${product.image || 'img/placeholder.png'}" alt="${product.name}">
+    <img src="${imgUrl}" alt="${product.name}">
     <h3 class="product-name">${product.name}</h3>
     <p class="product-desc">${product.description || ''}</p>
     <span class="product-price">S/.${Number(product.price).toFixed(2)}</span>
   `;
 
-card.addEventListener('click', () => {
-  const p = card.productData;
-  const catId = Number(p.category_id);
+  card.addEventListener('click', () => {
+    const p = card.productData;
+    const catId = Number(p.category_id);
 
-  if (catId === 1) {
-    openProductDetail(p, 'burger');
-  } else if (catId === 2) {
-    openProductDetail(p, 'drink');
-  } else if (catId === 4) {        // categoría de helados/postres
-    openProductDetail(p, 'dessert');
-  }
-});
+    if (catId === 1) {
+      openProductDetail(p, 'burger');
+    } else if (catId === 2) {
+      openProductDetail(p, 'drink');
+    } else if (catId === 4) {
+      openProductDetail(p, 'dessert');
+    }
+  });
 
   return card;
 }
@@ -1259,6 +1297,11 @@ function limpiarPedidoFinalizado() {
   }
 }
 
+
+
+
+
+
 // ✅=== MOSTRAR SEGUIMIENTO ===
 function mostrarSeguimiento() {
   document.querySelector('.nav').style.display = 'none';
@@ -1309,24 +1352,15 @@ function renderizarSeguimiento() {
     return;
   }
 
-  const productosDetalle = pedidoActivo.productos.map(p => {
-    let detalle = p.nombre;
-    if (p.opciones && Array.isArray(p.opciones) && p.opciones.length > 0) {
-      const opcionesFiltradas = p.opciones.filter(opt =>
-        !opt.includes("Estándar") &&
-        opt !== "Sin queso extra" &&
-        opt !== "Solo carne clásica" &&
-        opt !== "Estándar (lechuga, tomate, cebolla)"
-      );
-      if (opcionesFiltradas.length > 0) {
-        detalle += ` (${opcionesFiltradas.join(', ')})`;
-      }
-    }
-    if (p.cantidad && p.cantidad > 0) {
-      detalle += ` x${p.cantidad}`;
-    }
-    return detalle;
-  });
+const productosDetalle = pedidoActivo.productos.map(p => {
+  const base = `${p.nombre} x${p.cantidad || 1}`;
+  if (!Array.isArray(p.opciones) || p.opciones.length === 0) return base;
+
+  const opcionesFiltradas = p.opciones.filter(opt => !opt.includes('Estándar'));
+  if (opcionesFiltradas.length === 0) return base;
+
+  return `${base}\n${opcionesFiltradas.join(' | ')}`;
+});
 
   const estadosTexto = ["Pedido Recibido", "En Preparación", "Listo para Entrega", "Entregado"];
   const estadoActual = pedidoActivo.estado;
@@ -1368,23 +1402,24 @@ function renderizarSeguimiento() {
         <h2 style="font-size:20px; font-weight:700; color:#d35400; margin-bottom:16px;">Detalles del Pedido</h2>
         ${productosDetalle.map((detalle, i) => `
           <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:16px;">
-            <span>${detalle}</span>
-            <span style="font-weight:600; color:#e67e22;">${pedidoActivo.productos[i].precio}</span>
+            <span style="white-space: pre-line;">${detalle}</span>
+            <span style="font-weight:600; color:#e67e22;">
+            ${pedidoActivo.productos[i].precio}</span>
           </div>
         `).join('')}
       </div>
       <div style="background:#f0f9ff; padding:20px; border-radius:12px; margin-bottom:24px;">
         <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:15px;">
           <span>Subtotal</span>
-          <span>S/${pedidoActivo.subtotal}</span>
+          <span>S/${Number(pedidoActivo.subtotal).toFixed(2)}</span>
         </div>
         <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:15px;">
           <span>IGV</span>
-          <span>S/${pedidoActivo.igv}</span>
+          <span>S/${Number(pedidoActivo.igv).toFixed(2)}</span>
         </div>
         <div style="display:flex; justify-content:space-between; padding:8px 0; margin-top:12px; padding-top:12px; border-top:1px dashed #ccc; font-weight:700; font-size:17px; color:#e67e22;">
           <span>Total</span>
-          <span>S/${pedidoActivo.total}</span>
+          <span>S/${Number(pedidoActivo.total).toFixed(2)}</span>
         </div>
       </div>
       <div style="background:#f0f7ff; padding:16px; border-radius:12px; margin-bottom:24px;">
@@ -1422,6 +1457,19 @@ function renderizarSeguimiento() {
   });
   sessionStorage.setItem('vista-actual', 'seguimiento');
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ✅=== MOSTRAR HISTORIAL ===
 function mostrarHistorial() {

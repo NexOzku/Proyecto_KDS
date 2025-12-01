@@ -139,7 +139,7 @@
     </div>
   </div>
 </div>
-
+<div id="seguimiento-container" style="display:none;"></div>
     <!--✅ DETALLE DEL PRODUCTO -->
     <div id="product-detail">
       <!--✅ Botón Volver -->
@@ -191,7 +191,7 @@
         <p id="detail-price"></p>
         
         <!--✅ Botón Agregar al carrito -->
-<button id="add-to-cart-btn">
+<button id="add-to-cart-btn" class="add-to-cart-btn">
   Agregar al carrito
 </button>
       </div>
@@ -200,17 +200,16 @@
     </div>
 
     <!--✅ PANEL DE SEGUIMIENTO (dentro de .grid) -->
-    <div id="seguimiento-container">
+    <div id="seguimiento-container" style="display:none;"></div>
     </div>
   </div>
-
   <!--✅ MODAL DEL CARRITO -->
   <div id="modal-carrito" class="modal-carrito">
     <div class="modal-contenido">
       <span class="cerrar-modal" id="cerrarModalCarrito">&times;</span>
       <h1>Carrito de Compras</h1>
       <h3>Productos:</h3>
-      <div id="carrito-items" class="carrito-items"></div>
+      <div id="carrito-items" class="carrito-items"> </div>
       <div class="carrito-total">
         <h2>Total: S/.<span id="total-general">0.00</span></h2>
         <button id="btn-comprar">Comprar</button>
@@ -224,8 +223,6 @@
       <h3><!--<img src="img/iconos/warning.svg" alt="Advertencia" style="width: 25px; height: 25px; vertical-align: middle; margin-right: 0;">-->
         ⚠️Producto no disponible</h3>
       <p>No hay stock disponible en este momento.</p>
-        </h3>
-      <p></p>
       <button id="close-alert">Aceptar</button>
     </div>
   </div>
