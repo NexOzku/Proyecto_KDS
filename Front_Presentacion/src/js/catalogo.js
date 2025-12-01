@@ -7,7 +7,7 @@ const cartItemsDiv  = document.getElementById('carrito-items');
 const cartTotalSpan = document.getElementById('total-general');
 const closeCartSpan = document.getElementById('cerrarModalCarrito');
 const cartIconBtn   = document.getElementById('carrito-container');
-const cartCountSpan = document.getElementById('carrito-contador'); 
+
 
 function initDrinkOptions() {
   DRINK_OPTIONS = ALL_PRODUCTS.filter(p => Number(p.category_id) === 9);
@@ -58,7 +58,7 @@ async function loadAndRenderProducts() {
     // 1. Obtener los productos de la API
     const products = await getProducts(); // Esta función trae los datos
     ALL_PRODUCTS = products;
-    
+    initDrinkOptions();
     if (!products || products.length === 0) {
         console.log('No se pudieron cargar productos.');
         return;
@@ -70,7 +70,7 @@ async function loadAndRenderProducts() {
     const combosCarousel = document.getElementById('combos-carousel');  // ID para Categoría 3
     const combosEmpty = document.getElementById('combos-empty');
 
-
+inicializarEventosCarrito();
     let combosCount = 0; // Contador para saber si hay combos
 
 //Actualizar el Precio de Extras
@@ -159,21 +159,45 @@ const CART_STORAGE_KEY = 'miBarrioBurgerCart';
 
 /** Obtiene el carrito de localStorage */
 function getCart() {
-    try {
-        const cartJson = localStorage.getItem(CART_STORAGE_KEY);
-        // Aseguramos que cada ítem tenga un ID temporal y cantidad al recuperarse
-        return cartJson ? JSON.parse(cartJson).map(item => ({
-            ...item,
-            temp_id: item.temp_id || Date.now() + Math.random().toString(16).slice(2),
-            quantity: item.quantity || 1
-        })) : [];
-    } catch (e) {
-        console.error("Error al obtener el carrito de localStorage:", e);
-        return [];
-    }
+  try {
+    const cartJson = localStorage.getItem(CART_STORAGE_KEY);
+    return cartJson
+      ? JSON.parse(cartJson).map(item => ({
+          ...item,
+          temp_id: item.temp_id || Date.now() + Math.random().toString(16).slice(2),
+          quantity: item.quantity || 1
+        }))
+      : [];
+  } catch (e) {
+    console.error("Error al obtener el carrito de localStorage:", e);
+    return [];
+  }
 }
 
+const btnComprar = document.getElementById('btn-comprar')
+function inicializarEventosCarrito() {
+    // Es mejor usar document.getElementById aquí en lugar de la variable global btnComprar
+    const btnComprar = document.getElementById('btn-comprar'); 
 
+    if (btnComprar) {
+        btnComprar.addEventListener('click', () => {
+            
+            // ✅ CORRECCIÓN APLICADA: Obtener el estado real del carrito
+            const carritoActual = getCart(); 
+            
+            if (carritoActual.length === 0) {
+                // Aquí podrías usar tu `mostrarToast` o simplemente un alert
+                alert("El carrito está vacío. ¡Agrega productos primero! 🛍️"); 
+                return;
+            }
+            
+            // ✅ PASO FINAL: Redirección
+            window.location.href = 'pago.html';
+        });
+    } else {
+        console.error('Error: No se encontró el botón con ID "btn-comprar"');
+    }
+}
 
 /** Actualiza el contador numérico del carrito */
 function updateCartCount() {
@@ -293,7 +317,14 @@ function openProductDetail(product, mode = 'burger') {
     secQueso.style.display = 'none';
     secProt.style.display  = 'none';
     secComp.style.display  = 'none';
-
+const drinkOkBtnLocal = document.getElementById('drink-ok');
+if (drinkOkBtnLocal) { 
+        drinkOkBtnLocal.onclick = () => {
+            // ... (Tu lógica de clic) ...
+        };
+    } else {
+        console.error("Error: El botón 'drinkOkBtn' no fue encontrado en el DOM.");
+    }
     secPan.querySelector('h4').textContent = '🥤 Tipo de bebida';
 
     const panCont = document.getElementById('opts-pan');
@@ -560,6 +591,7 @@ function openCartModal() {
   renderCartModal();              // ← importante
   cartModal.style.display = 'block';
   attachCartListeners();
+  inicializarEventosCarrito();
 }
 
 function closeCartModal() {
@@ -780,25 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   // ✅=== Actualizar el bloque de usuario ===
- document.addEventListener("DOMContentLoaded", () => {
-    const user = JSON.parse(localStorage.getItem('user'));
 
-    if (!user) {
-        console.warn("No hay usuario logueado");
-        return;
-    }
-
-    const nameElement = document.querySelector('.user-display-name');
-    const roleElement = document.getElementById('user-role');
-
-    if (nameElement) {
-        nameElement.textContent = `${user.first_name} ${user.last_name}`;
-    }
-
-    if (roleElement) {
-        roleElement.textContent = user.roles[0] ?? "Cliente";
-    }
-});
   // ✅=== Configurar el menú desplegable ===
   if (trigger && dropdown && icon) {
     // ✅Toggle del menú
@@ -914,9 +928,10 @@ document.addEventListener('DOMContentLoaded', () => {
     sessionStorage.setItem('vista-actual', 'catalogo');
     mostrarCatalogo();
   }
-
-
+  inicializarEventosCarrito(); // Habilita el clic en el botón "Comprar"
+  updateCartCount();
 });
+
 
 // ✅=== EVENTOS DE NAVEGACIÓN ===
 document.querySelectorAll('.nav-item').forEach(item => {
@@ -969,6 +984,7 @@ const carritoItems = document.getElementById("carrito-items");
 const totalGeneral = document.getElementById("total-general");
 const contadorEl = document.getElementById("carrito-contador");
 const carritoIcon = document.getElementById("carrito-container");
+const cartCountSpan = document.getElementById('carrito-contador');
 
 if (carritoIcon) {
   carritoIcon.addEventListener("click", () => {
@@ -1054,56 +1070,7 @@ function agregarAlCarrito(producto) {
   mostrarToast("Producto agregado al carrito 🛒");
 }
 
-function renderizarCarrito() {
-  carritoItems.innerHTML = "";
-  if (carrito.length === 0) {
-    carritoItems.innerHTML = `<p class="vacio">Tu carrito está vacío</p>`;
-    totalGeneral.textContent = "0.00";
-    return;
-  }
-  const encabezado = document.createElement("div");
-  encabezado.className = "carrito-encabezado";
-  encabezado.innerHTML = `<span>Producto</span><span>Personalización</span><span>Cantidad</span><span>Subtotal</span><span></span>`;
-  carritoItems.appendChild(encabezado);
-  carrito.forEach((item, index) => {
-    const fila = document.createElement("div");
-    fila.className = "carrito-fila";
-    const productoCol = document.createElement("div");
-    productoCol.className = "carrito-producto";
-    productoCol.innerHTML = `<img src="${item.imagen}" alt="${item.nombre}"><span>${item.nombre}</span>`;
-    const opcionesCol = document.createElement("div");
-    opcionesCol.className = "carrito-opciones-scroll";
-    opcionesCol.textContent = item.opciones.length ? item.opciones.join(", ") : "Estándar";
-    const cantidadCol = document.createElement("input");
-    cantidadCol.type = "number";
-    cantidadCol.min = "1";
-    cantidadCol.value = item.cantidad;
-    cantidadCol.className = "input-cantidad";
-    cantidadCol.addEventListener("input", (e) => {
-      const val = parseInt(e.target.value) || 1;
-      item.cantidad = val;
-      subtotalCol.textContent = `S/.${(item.precio * item.cantidad).toFixed(2)}`;
-      actualizarTotalGeneral();
-      guardarCarrito();
-      actualizarContadorCarrito();
-    });
-    const subtotalCol = document.createElement("div");
-    subtotalCol.className = "subtotal";
-    subtotalCol.textContent = `S/.${(item.precio * item.cantidad).toFixed(2)}`;
-    const eliminarCol = document.createElement("span");
-    eliminarCol.className = "eliminar-item";
-    eliminarCol.textContent = "✖";
-    eliminarCol.addEventListener("click", () => {
-      carrito.splice(index, 1);
-      guardarCarrito();
-      renderizarCarrito();
-      actualizarContadorCarrito();
-    });
-    fila.append(productoCol, opcionesCol, cantidadCol, subtotalCol, eliminarCol);
-    carritoItems.appendChild(fila);
-  });
-  actualizarTotalGeneral();
-}
+
 
 function actualizarTotalGeneral() {
   const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
@@ -1133,7 +1100,6 @@ function mostrarToast(texto) {
     setTimeout(() => toast.remove(), 300);
   }, 1500);
 }
-
 
 
 
@@ -1215,15 +1181,6 @@ document.getElementById('back-to-catalog')?.addEventListener('click', () => {
   catalogDiv.style.display = 'block';
 });
 
-// ✅=== Comprar y proceder al pago ===
-document.getElementById('btn-comprar')?.addEventListener('click', () => {
-  if (carrito.length === 0) {
-    mostrarToast("Tu carrito está vacío");
-    return;
-  }
-  guardarCarrito();
-  window.location.href = 'pago.html';
-});
 
 //Mostrar Bebidas 
 let currentDrink = null;
@@ -1260,27 +1217,36 @@ function openDrinkModal(product) {
 }
 
 function closeDrinkModal() {
-  drinkModal.style.display = 'none';
-  currentDrink = null;
+    // ✅ CORRECCIÓN: Verifica que drinkModal exista antes de modificar su estilo
+    if (drinkModal) { 
+        drinkModal.style.display = 'none';
+    }
+    currentDrink = null;
 }
 
-drinkCancelBtn.onclick = closeDrinkModal();
+if (drinkCancelBtn) {
+    drinkCancelBtn.addEventListener('click', closeDrinkModal);
+}
 
-drinkOkBtn.onclick = () => {
-  if (!currentDrink) return;
-  const selected = document.querySelector('input[name="drink-temp"]:checked');
-  const extra = selected ? Number(selected.dataset.extraPrice) : 0;
-  const finalPrice = currentDrinkBase + extra;
+if (drinkOkBtn) {
+    drinkOkBtn.onclick = () => {
+        if (!currentDrink) return;
+        const selected = document.querySelector('input[name="drink-temp"]:checked');
+        const extra = selected ? Number(selected.dataset.extraPrice) : 0;
+        const finalPrice = currentDrinkBase + extra;
 
-  const selectedOptionId = selected ? Number(selected.value) : null;
+        const selectedOptionId = selected ? Number(selected.value) : null;
 
-  // aquí luego integras con tu carrito
-  console.log('Bebida:', currentDrink.name,
-              'opciónId:', selectedOptionId,
-              'precio final:', finalPrice);
+        console.log('Bebida:', currentDrink.name,
+                    'opciónId:', selectedOptionId,
+                    'precio final:', finalPrice);
 
-  closeDrinkModal();
+        closeDrinkModal();
+    };
+} else {
+    console.error("Error: El botón 'drinkOkBtn' no fue encontrado en el DOM.");
 };
+
 
 
 // Nota: las reglas de animación y estilos del carrito ahora están en `css/catalogo.css`.
