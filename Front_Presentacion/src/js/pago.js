@@ -1,6 +1,16 @@
-let carrito = JSON.parse(sessionStorage.getItem('carrito')) || [];
+const CART_STORAGE_KEY = 'miBarrioBurgerCart';
 const msgDiv = document.getElementById('mensaje-pago');
+const carrito = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
+const userData = JSON.parse(localStorage.getItem('user')) ||
+  JSON.parse(sessionStorage.getItem('user'));
 
+
+
+
+let nombreClienteDB = "Cliente sin sesión";
+if (userData && userData.first_name) {
+  nombreClienteDB = `${userData.first_name} ${userData.last_name}`;
+}
 // === Verificar carrito vacío al cargar ===
 if (carrito.length === 0) {
   msgDiv.innerHTML = "Tu carrito ya fue procesado. No puedes realizar otro pago.";
@@ -28,7 +38,6 @@ metodos.forEach(radio => {
     msgDiv.style.display = 'none';
   });
 });
-
 // === FUNCIONES DE MENSAJE ===
 function mostrarMensajeConIcono(mensaje, esExito) {
   const iconSrc = esExito ? 'img/iconos/check_circle.svg' : 'img/iconos/cancel.svg';
@@ -52,7 +61,11 @@ document.getElementById('btn-pagar').addEventListener('click', async () => {
     mostrarMensajeTexto("Tu carrito ya fue procesado. No puedes realizar otro pago.");
     return;
   }
-
+  const metodoSeleccionado = document.querySelector('input[name="metodo"]:checked');
+  if (!metodoSeleccionado) {
+    mostrarMensajeConIcono("Selecciona un método de pago.", false);
+    return;
+  }
   const metodo = document.querySelector('input[name="metodo"]:checked').value;
   let exito = false;
   let nombreCliente = "Cliente General";
@@ -63,73 +76,113 @@ document.getElementById('btn-pagar').addEventListener('click', async () => {
     const venc = document.getElementById('vencimiento').value.trim();
     const cvv = document.getElementById('cvv').value.trim();
 
-    if (!titular) {
-      mostrarMensajeConIcono("Pago rechazado. Intente otro método.", false);
-      return;
-    }
-    if (titular.toLowerCase() === "error") {
-      mostrarMensajeConIcono("Pago rechazado. Intente otro método.", false);
-      return;
-    }
-    if (!num || !venc || !cvv) {
-      mostrarMensajeConIcono("Pago rechazado. Intente otro método.", false);
+    // Comprobar que los campos mínimos estén llenos
+    if (!titular || !num || !venc || !cvv) {
+      mostrarMensajeConIcono("Pago rechazado: Faltan datos de la tarjeta.", false);
       return;
     }
 
+    // Mantenemos la prueba de error intencional (si se desea)
+    if (titular.toLowerCase() === "error") {
+      mostrarMensajeConIcono("Pago rechazado. Titular bloqueado.", false);
+      return;
+    }
+
+    // Si pasa las validaciones básicas, SIMULA ÉXITO
     nombreCliente = titular;
-    exito = true;
+    exito = true; // Se marca como exitoso y continúa el flujo
   } else {
     nombreCliente = "Cliente Yape";
     exito = true;
   }
 
   if (exito) {
+    const ahora = new Date();
+    const fechaStr = ahora.toLocaleString('es-PE');
     // === CALCULAR TOTALES ===
     let subtotal = 0;
     carrito.forEach(item => {
-      subtotal += item.precio * item.cantidad;
+      const rawPrice = item.final_price ?? item.precio ?? item.base_price ?? item.price;
+      const precioNum = Number(rawPrice);
+      const precio = isNaN(precioNum) ? 0 : precioNum;
+      const cantidad = Number(item.cantidad ?? item.quantity) || 1;
+
+      subtotal += precio * cantidad;
     });
+
     const igv = subtotal * 0.18;
     const total = subtotal + igv;
 
     // === GUARDAR PEDIDO EN sessionStorage ===
     const hoy = new Date();
-    const pedidoGuardado = {
-      id: `#ORD-${hoy.getFullYear()}-${String(carrito.length).padStart(3, '0')}`,
-      fecha: hoy.toLocaleDateString('es-PE', {
+    const fechaFormateada =
+      hoy.toLocaleDateString('es-PE', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit'
-      }) + ' - ' + hoy.toLocaleTimeString('es-PE', {
+      }) +
+      ' - ' +
+      hoy.toLocaleTimeString('es-PE', {
         hour: '2-digit',
         minute: '2-digit'
-      }),
+      });
+
+
+    const pedidoGuardado = {
+      id: `#ORD-${hoy.getFullYear()}-${String(carrito.length).padStart(3, '0')}`,
+      fecha: fechaStr,
       ubicacion: "Av. Principal 123, Distrito Centro",
-      estado: 0, // Estado inicial: Pedido Recibido
-      productos: carrito.map(item => ({
-        nombre: item.nombre,
-        opciones: item.opciones || ["Estándar"], // ← Asegurar que exista
-        cantidad: item.cantidad || 1,           // ← Asegurar que exista
-        precio: `S/${item.precio.toFixed(2)}`
-      })),
-      subtotal: subtotal.toFixed(2),
-      igv: igv.toFixed(2),
-      total: total.toFixed(2)
+      estado: 0,
+      productos: carrito.map(item => {
+        const precio = Number(item.precio ?? item.price ?? item.final_price);
+        const precioLimpio = isNaN(precio) ? 0 : precio;
+
+        const opcionesLimpio = Array.isArray(item.extras)
+          ? item.extras.map(extra => {
+            if (typeof extra === 'string') return extra;
+            if (extra && typeof extra === 'object') {
+              if (extra.name && extra.price) return `${extra.name} (+S/${extra.price})`;
+              if (extra.name) return extra.name;
+              return JSON.stringify(extra);
+            }
+            return String(extra);
+          })
+          : (item.opciones ? [String(item.opciones)] : ["Estándar"]);
+
+        return {
+          nombre: item.nombre || item.name || "Producto Desconocido",
+          opciones: opcionesLimpio,
+          cantidad: item.cantidad || item.quantity || 1,
+          precio: precioLimpio  // guarda número
+        };
+      }),
+      subtotal: Number(subtotal.toFixed(2)),
+      igv: Number(igv.toFixed(2)),
+      total: Number(total.toFixed(2))
     };
+
+    sessionStorage.setItem('pedido-activo', JSON.stringify(pedidoGuardado));
+    const historial = JSON.parse(sessionStorage.getItem('historial-pedidos')) || [];
+    historial.unshift(pedidoGuardado);
+    sessionStorage.setItem('historial-pedidos', JSON.stringify(historial));
 
     // Guardar como pedido activo y en historial
     sessionStorage.setItem('pedido-activo', JSON.stringify(pedidoGuardado));
-    const historial = JSON.parse(sessionStorage.getItem('historial-pedidos')) || [];
     historial.unshift(pedidoGuardado); // Más reciente al inicio
     sessionStorage.setItem('historial-pedidos', JSON.stringify(historial));
 
     // === Notificar éxito y generar PDF ===
     mostrarMensajeConIcono("Pago realizado con éxito. Tu pedido ha sido confirmado.", true);
-    await generarPDF(nombreCliente);
-    window.location.href = 'catalogo.html?seccion=seguimiento';
+    console.log('carrito antes de generarPDF:', carrito);
+    generarPDF(nombreClienteDB);
+
+    setTimeout(() => {
+      localStorage.removeItem(CART_STORAGE_KEY);
+      window.location.href = 'catalogo.html?seccion=seguimiento';
+    }, 2000);
 
     // Limpiar carrito y marcar como pagado
-    sessionStorage.removeItem('carrito');
+    sessionStorage.removeItem(CART_STORAGE_KEY);  // 'carrito'
     pagoRealizado = true;
   } else {
     mostrarMensajeConIcono("Pago rechazado. Intente otro método.", false);
@@ -137,43 +190,85 @@ document.getElementById('btn-pagar').addEventListener('click', async () => {
 });
 
 // === FUNCIÓN GENERAR PDF ===
-async function generarPDF(nombreCliente) {
-  const { jsPDF } = window.jspdf;
-  document.getElementById('nombre-cliente-boleta').textContent = nombreCliente;
-
-  const hoy = new Date();
-  const fechaStr = hoy.toLocaleDateString('es-PE', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  });
-  document.querySelector('.fecha-boleta').textContent = fechaStr;
-
+async function generarPDF(nombreClienteDB) {
   const detalleBoleta = document.getElementById('detalle-boleta');
-  detalleBoleta.innerHTML = '';
+  const subtotalSpan = document.getElementById('subtotal-boleta');
+  const igvSpan = document.getElementById('igv-boleta');
+  const totalSpan = document.getElementById('total-boleta');
+  const fechaBoletaSpan = document.querySelector('.fecha-boleta');
+  const nombreClienteSpan = document.getElementById('nombre-cliente-boleta');
+  const dniClienteSpan = document.getElementById('dni-cliente-boleta');
+  const emailClienteSpan = document.getElementById('email-cliente-boleta');
+
+  // Usuario
+  const userData = JSON.parse(localStorage.getItem('user')) ||
+    JSON.parse(sessionStorage.getItem('user')) || {};
+
+  const nombreCompleto =
+    nombreClienteDB ||
+    `${userData.first_name || ''} ${userData.last_name || ''}`.trim() ||
+    'Cliente General';
+
+  nombreClienteSpan.textContent = nombreCompleto;
+  dniClienteSpan.textContent = userData.nro_document || '---------';
+  emailClienteSpan.textContent = userData.email || '---------';
+
+  const ahora = new Date();
+  const fechaStr = ahora.toLocaleString('es-PE');
+  fechaBoletaSpan.textContent = fechaStr;
+
+  // Detalle y totales
   let subtotal = 0;
+  detalleBoleta.innerHTML = '';
 
   carrito.forEach(item => {
-    const precioUnitario = item.precio;
+    const rawPrice = item.final_price ?? item.precio ?? item.base_price ?? item.price;
+    const precioNum = Number(rawPrice);
+    const precio = isNaN(precioNum) ? 0 : precioNum;
+    const cantidad = Number(item.cantidad ?? item.quantity) || 1;
+    const totalItem = precio * cantidad;
+
+    let opciones = 'Estándar';
+    if (Array.isArray(item.extras) && item.extras.length > 0) {
+      const textos = item.extras.map(extra => {
+        if (typeof extra === 'string') return extra;
+        if (extra && typeof extra === 'object') {
+          if (extra.name && extra.price) return `${extra.name} (+S/${extra.price})`;
+          if (extra.name) return extra.name;
+          return JSON.stringify(extra);
+        }
+        return String(extra);
+      });
+      opciones = textos.join(', ');
+    } else if (Array.isArray(item.opciones) && item.opciones.length > 0) {
+      opciones = item.opciones.join(', ');
+    } else if (item.opciones) {
+      opciones = String(item.opciones);
+    }
+
+    const nombreProducto = item.nombre ?? item.name ?? 'N/A';
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="padding: 10px; border: 1px solid #ddd; font-size: 11px;">${item.nombre}</td>
-      <td style="padding: 10px; border: 1px solid #ddd; font-size: 11px;">${item.opciones.join(', ')}</td>
-      <td style="padding: 10px; border: 1px solid #ddd; font-size: 11px; text-align: right;">S/ ${precioUnitario.toFixed(2)}</td>
-      <td style="padding: 10px; border: 1px solid #ddd; font-size: 11px; text-align: center;">${item.cantidad}</td>
-      <td style="padding: 10px; border: 1px solid #ddd; font-size: 11px; text-align: right;">S/ ${(item.precio * item.cantidad).toFixed(2)}</td>
+      <td style="padding:10px;border:1px solid #ddd;font-size:11px;">${nombreProducto}</td>
+      <td style="padding:10px;border:1px solid #ddd;font-size:11px;">${opciones}</td>
+      <td style="padding:10px;border:1px solid #ddd;font-size:11px;text-align:right;">S/ ${precio.toFixed(2)}</td>
+      <td style="padding:10px;border:1px solid #ddd;font-size:11px;text-align:center;">${cantidad}</td>
+      <td style="padding:10px;border:1px solid #ddd;font-size:11px;text-align:right;">S/ ${totalItem.toFixed(2)}</td>
     `;
     detalleBoleta.appendChild(tr);
-    subtotal += item.precio * item.cantidad;
+    subtotal += totalItem;
   });
 
   const igv = subtotal * 0.18;
   const total = subtotal + igv;
-  document.getElementById('subtotal-boleta').textContent = subtotal.toFixed(2);
-  document.getElementById('igv-boleta').textContent = igv.toFixed(2);
-  document.getElementById('total-boleta').textContent = total.toFixed(2);
 
-  // === Generar PDF ===
+  subtotalSpan.textContent = subtotal.toFixed(2);
+  igvSpan.textContent = igv.toFixed(2);
+  totalSpan.textContent = total.toFixed(2);
+
+  // PDF
+  const { jsPDF } = window.jspdf;
   const pdf = new jsPDF('p', 'pt', 'a4');
   const boleta = document.getElementById('boleta-pdf');
 
@@ -203,4 +298,3 @@ async function generarPDF(nombreCliente) {
 
   pdf.save(`Boleta_MiBarrioBurger_${fechaStr.replace(/\//g, '-')}.pdf`);
 }
-

@@ -68,6 +68,14 @@ const categoriasMap = {
     7: "pollos y mas"
 };
 
+// Función para formatear moneda, necesaria para la fila.
+function formatCurrency(value) {
+    if (!value) return '0.00';
+    const num = parseFloat(value);
+    if (isNaN(num)) return '0.00';
+    return num.toFixed(2);
+}
+
 function crearFilaProducto(producto, estado) {
     const tr = document.createElement('tr');
     tr.setAttribute('data-product-id', producto.id);

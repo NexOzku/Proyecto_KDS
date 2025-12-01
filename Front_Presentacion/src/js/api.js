@@ -75,13 +75,34 @@ async function apiCall(method, endpoint, body = null) {
 const productAPI = {
     // Crear producto
     create: async (data) => {
-        return apiCall('POST', API_PRODUCTS_ENDPOINT, {
-            name: data.name || data.nombre,
-            description: data.description || data.descripcion,
-            price: parseFloat(data.price || data.precio),
-            stock: parseInt(data.stock) || 0,
-            category_id: parseInt(data.category_id || data.categoria_id)
-        });
+        console.log('API Create: Received data', data);
+        if (!data) {
+            return Promise.reject(new Error("No se proporcionaron datos para crear el producto."));
+        }
+
+        let dataObject = data;
+        if (data instanceof FormData) {
+            console.log('API Create: Data is FormData, converting to object...');
+            dataObject = {};
+            for (const [key, value] of data.entries()) {
+                dataObject[key] = value;
+            }
+            console.log('API Create: Converted FormData:', dataObject);
+        }
+
+        const payload = {
+            name: dataObject.name || dataObject.nombre,
+            description: dataObject.description || dataObject.descripcion,
+            price: parseFloat(dataObject.price || dataObject.precio),
+            stock: parseInt(dataObject.stock, 10) || 0,
+            category_id: parseInt(dataObject.category_id || dataObject.categoria_id, 10)
+        };
+
+        if (dataObject.image) payload.image = dataObject.image;
+        if (dataObject.extras) payload.extras = dataObject.extras;
+
+        console.log('API Create: Sending payload', payload);
+        return apiCall('POST', API_PRODUCTS_ENDPOINT, payload);
     },
 
     // Obtener todos los productos
@@ -96,13 +117,34 @@ const productAPI = {
 
     // Actualizar producto
     update: async (id, data) => {
-        return apiCall('PUT', `${API_PRODUCTS_ENDPOINT}/${id}`, {
-            name: data.name || data.nombre,
-            description: data.description || data.descripcion,
-            price: parseFloat(data.price || data.precio),
-            stock: parseInt(data.stock),
-            category_id: parseInt(data.category_id || data.categoria_id)
-        });
+        console.log(`API Update ${id}: Received data`, data);
+        if (!data) {
+            return Promise.reject(new Error("No se proporcionaron datos para actualizar el producto."));
+        }
+
+        let dataObject = data;
+        if (data instanceof FormData) {
+            console.log(`API Update ${id}: Data is FormData, converting to object...`);
+            dataObject = {};
+            for (const [key, value] of data.entries()) {
+                dataObject[key] = value;
+            }
+            console.log(`API Update ${id}: Converted FormData:`, dataObject);
+        }
+
+        const payload = {
+            name: dataObject.name || dataObject.nombre,
+            description: dataObject.description || dataObject.descripcion,
+            price: parseFloat(dataObject.price || dataObject.precio),
+            stock: parseInt(dataObject.stock, 10),
+            category_id: parseInt(dataObject.category_id || dataObject.categoria_id, 10)
+        };
+        
+        if (dataObject.image) payload.image = dataObject.image;
+        if (dataObject.hasOwnProperty('blocked')) payload.blocked = dataObject.blocked;
+
+        console.log(`API Update ${id}: Sending payload`, payload);
+        return apiCall('PUT', `${API_PRODUCTS_ENDPOINT}/${id}`, payload);
     },
 
     // Eliminar producto

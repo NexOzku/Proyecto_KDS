@@ -348,11 +348,6 @@
                     <p>Agregar un nuevo producto al menú</p>
                 </header>
 
-                <nav class="cp-tabs">
-                    <button class="cp-tab active" data-tab="detalle">Detalle de Producto</button>
-                    <button class="cp-tab" data-tab="insumos">Insumos</button>
-                </nav>
-
                 <main class="cp-content">
                     <section id="cp-detalle" class="cp-tab-content active">
                         <div class="cp-form-section">
@@ -360,14 +355,18 @@
                             <form id="cp-productoForm" novalidate>
                                 <div class="cp-form-group">
                                     <label for="cp-nombre">Nombre del Producto *</label>
-                                    <input type="text" id="cp-nombre" placeholder="Ej: Triple carne" required />
+                                    <input type="text" id="cp-nombre" placeholder="Ej: Triple carne" />
                                 </div>
-
+                                <div class="cp-form-group">
+                                    <label for="cp-descripcion">Descripción *</label>
+                                    <textarea id="cp-descripcion"
+                                        placeholder="Contiene triple carne con salsa especial de la casa"></textarea>
+                                </div>
                                 <div class="cp-form-group">
                                     <label for="cp-categoria">Categoría *</label>
-                                    <select id="cp-categoria" required>
+                                    <select id="cp-categoria">
                                         <option value="">Seleccionar...</option>
-                                        <option value="1">Hamburguesas</option> 
+                                        <option value="1">Hamburguesas</option>
                                         <option value="2">Bebidas</option>
                                         <option value="3">Postres</option>
                                         <option value="4">Acompañamientos</option>
@@ -375,62 +374,24 @@
                                 </div>
                                 <div class="cp-form-group">
                                     <label for="cp-precio">Precio *</label>
-                                    <input type="number" id="cp-precio" step="0.01" min="0" placeholder="S/ 25.00"
-                                        required />
+                                    <input type="number" id="cp-precio" step="0.01" min="0" placeholder="S/ 25.00" />
                                 </div>
                                 <div class="cp-form-group">
                                     <label for="cp-stock">Stock Inicial *</label>
-                                    <input type="number" id="cp-stock" min="0" placeholder="0" value="0" required />
+                                    <input type="number" id="cp-stock" min="0" placeholder="0" value="0" />
                                 </div>
-
                                 <div class="cp-form-group">
-                                    <label for="cp-imagen">Imagen (Solo visual/ruta) *</label>
+                                    <label for="cp-imagen">Imagen *</label>
                                     <input type="file" id="cp-imagen" accept="image/*" />
                                     <div class="cp-image-preview" id="cp-imagePreview">
                                         <div class="cp-image-placeholder">📷 Arrastre o seleccione una imagen</div>
                                     </div>
                                 </div>
                                 <div class="cp-form-actions">
-                                    <button type="button" class="cp-btn cp-btn-primary"
-                                        id="cp-btnSiguiente">Siguiente</button>
+                                    <button type="submit" class="cp-btn cp-btn-primary" id="cp-btnCrear">Crear
+                                        Producto</button>
                                 </div>
                             </form>
-                        </div>
-                    </section>
-
-                    <section id="cp-insumos" class="cp-tab-content">
-                        <div class="cp-insumos-container">
-                            <div class="cp-insumos-disponibles">
-                                <h3>Insumos Disponibles</h3>
-                                <div class="cp-lista-wrapper">
-                                    <ul id="cp-listaInsumos"></ul>
-                                </div>
-                            </div>
-                            <div class="cp-insumos-seleccionados">
-                                <h3>Insumos Seleccionados</h3>
-                                <div class="cp-table-wrapper">
-                                    <table id="cp-tablaSeleccionados">
-                                        <thead>
-                                            <tr>
-                                                <th>Insumo</th>
-                                                <th>Unidad</th>
-                                                <th>Cantidad</th>
-                                                <th>Costo Unit.</th>
-                                                <th>Subtotal</th>
-                                                <th>Acción</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="cp-cuerpoSeleccionados"></tbody>
-                                    </table>
-                                </div>
-                                <div class="cp-costo-total">
-                                    Costo de Producción: S/ <span id="cp-costoTotal">0.00</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cp-form-actions">
-                            <button type="button" class="cp-btn cp-btn-secondary" id="cp-btnVolver">Volver</button>
-                            <button type="button" class="cp-btn cp-btn-primary" id="cp-btnCrear">Crear Producto</button>
                         </div>
                     </section>
                 </main>
@@ -517,6 +478,8 @@
                 </div>
             </div>
         </section>
+
+
 
         <!-- ✅ SECCIÓN: Eliminar Producto -->
         <section id="eliminar-producto" class="section">
