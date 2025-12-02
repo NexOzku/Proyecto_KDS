@@ -90,7 +90,6 @@ async function getProducts() {
     return [];
   }
 }
-
 async function loadAndRenderProducts() {
   // 1. Obtener los productos de la API
   const products = await getProducts(); // Esta función trae los datos
@@ -107,9 +106,6 @@ async function loadAndRenderProducts() {
   const combosCarousel = document.getElementById('combos-carousel');  // ID para Categoría 3
   const combosEmpty = document.getElementById('combos-empty');
 
-  burgerCarousel.innerHTML = '';
-drinkCarousel.innerHTML  = '';
-combosCarousel.innerHTML = '';
   inicializarEventosCarrito();
   let combosCount = 0; // Contador para saber si hay combos
 

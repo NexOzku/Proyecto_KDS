@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Método de Pago - MiBarrioBurger</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="css/pago.css" />
+</head>
+
+<body>
+  <!--✅ Botón de volver -->
+  <a href="catalogo.html" id="btn-volver">← Volver</a>
+
+  <!--✅ Contenedor principal de pago -->
+  <div class="pago-contenedor">
+    <h1>Método de Pago</h1>
+    
+    <!--✅ Selección de método de pago -->
+    <div class="metodo-pago">
+      <label>
+        <input type="radio" name="metodo" value="tarjeta" checked> Tarjeta
+      </label>
+      <label>
+        <input type="radio" name="metodo" value="yape"> Yape / Plin
+      </label>
+    </div>
+
+    <!--✅ Campos de tarjeta y Yape/Plin -->
+    <div class="campos-tarjeta activo">
+      <div class="form-group">
+        <label>Número de tarjeta</label>
+        <input type="text" id="num-tarjeta" placeholder="1234 5678 9012 3456" maxlength="19">
+      </div>
+      <div class="form-group">
+        <label>Titular</label>
+        <input type="text" id="titular" placeholder="Nombre del titular" required>
+      </div>
+      <div class="form-group">
+        <label>Fecha de vencimiento</label>
+        <input type="text" id="vencimiento" placeholder="MM/AA" maxlength="5">
+      </div>
+      <div class="form-group">
+        <label>CVV</label>
+        <input type="number" id="cvv" placeholder="123" maxlength="4" min="0"
+          oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
+      </div>
+    </div>
+
+    <!--✅ Campos de Yape/Plin -->
+    <div class="campos-yape">
+      <div id="qr-yape">📱</div>
+      <p style="text-align: center; color: black; font-size: 16px;">Escanea aquí para pagar con Yape/Plin</p>
+    </div>
+
+    <!--✅ Botón de pagar -->
+    <button id="btn-pagar">Pagar Ahora</button>
+
+    <!--✅ Mensaje de confirmación -->
+    <div id="mensaje-pago"></div>
+  </div>
+
+  <!--✅ Boleta oculta para PDF -->
+  <div id="boleta-pdf">
+
+    <!--✅ Encabezado de la boleta -->
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h1 style="text-align: center; color: #555; font-size: 24px; margin-bottom: 4px;">Mi Barrio Burger</h1>
+      <p style="font-size: 12px; color: #555; line-height: 1.4;">
+        RUC: 20123456789<br>
+        Av. Principal 123, Lima, Perú<br>
+        Tel: (01) 234-5678
+      </p>
+    </div>
+
+    <!--✅ Información de la boleta -->
+    <div
+      style="text-align: center; margin: 20px 0; padding: 10px; background: #f9f9f9; border-radius: 8px; border: 1px dashed #555;">
+      <strong style="font-size: 16px; color: #555;">BOLETA DE VENTA ELECTRÓNICA</strong><br>
+      <span style="font-size: 14px;">N° 001-000001</span>
+    </div>
+
+    <!--✅ Detalles del cliente y fecha -->
+    <div style="text-align: center; margin-bottom: 20px; font-size: 13px; color: #333;">
+      Fecha: <span class="fecha-boleta"></span>
+    </div>
+
+    <!--✅ Información del cliente -->
+    <div
+      style="text-align: left; margin-bottom: 20px; padding: 12px; background: #f9f9f9; border-radius: 8px; font-size: 13px;">
+<strong>Cliente:</strong> <span id="nombre-cliente-boleta">Cliente General</span><br>
+<strong>Documento:</strong> <span id="dni-cliente-boleta">70123456</span><br>
+<strong>Email:</strong> <span id="email-cliente-boleta">cliente@ejemplo.com</span>
+    </div>
+
+    <!--✅ Detalles de los productos -->
+    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+      <thead>
+        <tr style="background: white; color: #555; border: 1px solid #ddd;">
+          <th style="padding: 10px; font-size: 12px;">Producto</th>
+          <th style="padding: 10px; font-size: 12px;">Personalización</th>
+          <th style="padding: 10px; font-size: 12px;">Precio</th>
+          <th style="padding: 10px; font-size: 12px;">Cant.</th>
+          <th style="padding: 10px; font-size: 12px;">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="detalle-boleta" style="border: 1px solid #ddd;">
+        <!-- Se llena dinámicamente -->
+      </tbody>
+    </table>
+
+    <!--✅ Totales -->
+    <div style="text-align: right; margin-top: 20px; font-size: 14px;">
+      <div style="margin: 6px 0; color: #555">
+        <strong>Subtotal:</strong> S/ <span id="subtotal-boleta">0.00</span>
+      </div>
+      <div style="margin: 6px 0; color: #555">
+        <strong>IGV (18%):</strong> S/ <span id="igv-boleta">0.00</span>
+      </div>
+      <div
+        style="margin: 12px 0; font-size: 18px; font-weight: bold; color: #555; border-top: 2px solid #555; padding-top: 10px;">
+        TOTAL: S/ <span id="total-boleta">0.00</span>
+      </div>
+    </div>
+
+    <!--✅ Código QR para verificación -->
+    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #555;">
+      <div style="font-size: 80px; color: #555; margin-bottom: 8px;">📱</div>
+      <p style="font-size: 12px; color: #777;">Código QR para verificación</p>
+    </div>
+  </div>
+
+  <script src="js/pago.js"></script>
+</body>
+
+</html>
