@@ -1,0 +1,397 @@
+/* Solo aplicar estos estilos si estamos dentro de #crear-producto */
+#crear-producto .cp-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#crear-producto .cp-header {
+    background: white;
+    padding: 15px 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#crear-producto .cp-header h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+    color: #2563eb;
+}
+
+#crear-producto .cp-header p {
+    margin: 5px 0 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+#crear-producto .cp-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 20px;
+}
+
+#crear-producto .cp-tab {
+    padding: 10px 20px;
+    background: #e9ecef;
+    border: 1px solid #ccc;
+    position: relative;
+    z-index: 1;
+}
+
+#crear-producto .cp-tab:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+#crear-producto .cp-tab:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+#crear-producto .cp-tab.active {
+    background: white;
+    border-bottom: 2px solid #2563eb;
+    z-index: 2;
+}
+
+#crear-producto .cp-content {
+    display: grid;
+    gap: 20px;
+}
+
+#crear-producto .cp-tab-content {
+    display: none;
+    padding: 20px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#crear-producto .cp-tab-content.active {
+    display: block;
+}
+
+#crear-producto .cp-form-section {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+}
+
+#crear-producto .cp-form-section h3 {
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+    font-size: 1.1rem;
+    color: #2563eb;
+}
+
+#crear-producto .cp-form-group {
+    margin-bottom: 15px;
+}
+
+#crear-producto .cp-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+#crear-producto .cp-form-group input,
+#crear-producto .cp-form-group textarea,
+#crear-producto .cp-form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: #fff;
+}
+
+#crear-producto .cp-form-group textarea {
+    height: 80px;
+    resize: vertical;
+}
+
+#crear-producto .cp-image-preview {
+    width: 150px;
+    height: 150px;
+    margin-top: 10px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #fafafa;
+}
+
+#crear-producto .cp-image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#crear-producto .cp-image-placeholder {
+    font-size: 0.8rem;
+    color: #999;
+    text-align: center;
+    padding: 10px;
+}
+
+#crear-producto .cp-btn {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+#crear-producto .cp-btn:hover {
+    background: #f0f0f0;
+}
+
+#crear-producto .cp-btn-primary {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+#crear-producto .cp-btn-primary:hover {
+    background: #3b82f6;
+}
+
+#crear-producto .cp-btn-secondary {
+    background: #6c757d;
+    color: white;
+    border-color: #6c757d;
+}
+
+#crear-producto .cp-btn-secondary:hover {
+    background: #5a6268;
+}
+
+#crear-producto .cp-insumos-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+#crear-producto .cp-insumos-disponibles,
+#crear-producto .cp-insumos-seleccionados {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 570px;
+    overflow-y: auto;
+}
+
+#crear-producto .cp-insumos-disponibles h3,
+#crear-producto .cp-insumos-seleccionados h3 {
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+    font-size: 1.1rem;
+    color: #2563eb;
+}
+
+#crear-producto .cp-insumo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: #fff;
+}
+
+#crear-producto .cp-insumo-info {
+    flex: 1 1 auto;
+    margin-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#crear-producto .cp-add-btn {
+    background: #2563eb;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+}
+
+#crear-producto .cp-add-btn:hover {
+    background: #3b82f6;
+}
+
+#crear-producto #cp-tablaSeleccionados {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    word-break: break-word;
+}
+
+#crear-producto #cp-tablaSeleccionados th,
+#crear-producto #cp-tablaSeleccionados td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
+}
+
+#crear-producto #cp-tablaSeleccionados th {
+    background: #e9ecef;
+    font-weight: 600;
+}
+
+#crear-producto .cp-costo-total {
+    margin-top: auto;
+    padding: 10px;
+    background: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: right;
+    font-weight: bold;
+}
+
+#crear-producto .cp-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+    gap: 12px;
+}
+
+#crear-producto .cp-remove-btn {
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    padding: 0;
+    font-weight: bold;
+}
+
+#crear-producto .cp-remove-btn:hover {
+    background: #b91c1c;
+}
+
+#crear-producto .cp-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: cp-fadeIn 0.3s ease-out;
+}
+
+#crear-producto .cp-modal.hidden {
+    display: none;
+}
+
+#crear-producto .cp-modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    width: 400px;
+    max-width: 90%;
+}
+
+#crear-producto .cp-modal-title {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #2563eb;
+    font-weight: bold;
+}
+
+#crear-producto .cp-alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #ccc;
+    border-left: 4px solid #dc2626;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 12px 20px;
+    z-index: 1000;
+    max-width: 90vw;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: cp-slideIn 0.3s ease-out;
+    white-space: normal;
+    word-break: break-word;
+}
+
+#crear-producto .cp-alert.success {
+    border-left-color: #2563eb;
+}
+
+@keyframes cp-fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes cp-slideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%);
+    }
+}
+
+#crear-producto .cp-hidden {
+    display: none !important;
+}
+
+#crear-producto ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#crear-producto #cp-listaInsumos .cp-insumo-item {
+    width: 100%;
+}
