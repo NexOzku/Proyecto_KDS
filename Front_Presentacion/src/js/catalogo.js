@@ -27,19 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     mostrarCatalogo();
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
 // ✅=== FUNCIONES EXISTENTES (NO MODIFICADAS) ===
 // ✅Función para mostrar secciones del catálogo
 function showSection(sectionId) {
@@ -61,20 +48,20 @@ function showSection(sectionId) {
   currentFilter = sectionId;
 }
 
+const BASE_URL = 'http://burger-api-sandbox.com/';
+
 function getProductImageUrl(product) {
   const img = product?.image;
-  if (!img) return 'img/placeholder.png';
 
-  // Si ya es URL completa
-  if (img.startsWith('http')) return img;
-
-  // Si empieza con "uploads/" o "/uploads/", solo agrega dominio
-  if (img.startsWith('uploads/') || img.startsWith('/uploads/')) {
-    return 'http://burger-api-sandbox.com/' + img.replace(/^\/+/, '');
+  if (!img) {
+    return 'img/placeholder.png';
   }
 
-  // Si solo es nombre de archivo (caso futuro)
-  return 'http://burger-api-sandbox.com/uploads/products/' + img;
+  if (img.startsWith('http://') || img.startsWith('https://')) {
+    return img;
+  }
+
+  return BASE_URL + img.replace(/^\/+/, '');
 }
 
 const API_URL = 'http://burger-api-sandbox.com/auth/products';
