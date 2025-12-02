@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel de Administración</title>
+    <link rel="stylesheet" href="css/admin.css" />
+    <link rel="stylesheet" href="css/bloquear_producto.css">
+    <link rel="stylesheet" href="css/crear_producto.css">
+    <link rel="stylesheet" href="css/editar_producto.css">
+    <link rel="stylesheet" href="css/eliminar_producto.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/gestion_roles_permisos.css">
+    <link rel="stylesheet" href="css/mantenimiento.css">
+    <link rel="stylesheet" href="css/reporte_productos_populares.css">
+    <link rel="stylesheet" href="css/reporte_ventas.css">
+    <link rel="stylesheet" href="css/gestion_roles_permisos.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <!-- Librería para gráficos del Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <!--Esto es para el dassboard me genera error, eliminar cuando te hayas descahido todo lo referente al dassboard-->
+    <!--Esto es para el dassboard me genera error, eliminar cuando te hayas descahido todo lo referente al dassboard-->
+
+    <!-- ✅ Verificación de Autenticación -->
+    <script>
+        (function () {
+            const token = sessionStorage.getItem('token') || sessionStorage.getItem('access_token');
+            if (!token) {
+                console.warn('No hay token de autenticación. Redirigiendo a login...');
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <!-- ✅ BARRA LATERAL DE NAVEGACIÓN -->
+    <aside class="sidebar">
+        <!-- ✅ ENCABEZADO DE LA BARRA LATERAL -->
+        <div class="sidebar-header">
+            <h2>⚙️ Admin Panel</h2>
+        </div>
+
+        <!-- ✅ NAVEGACIÓN DE LA BARRA LATERAL -->
+        <ul class="sidebar-nav">
+            <!-- ✅ BOTÓN: Inicio -->
+            <li class="nav-item active" data-view="inicio">
+                <span>🏠 Inicio</span>
+            </li>
+
+            <!-- ✅ BOTÓN: Dashboard -->
+            <li class="nav-item" data-view="dashboard">
+                <span>📊 Dashboard</span>
+            </li>
+
+            <!-- ✅ NUEVO BOTÓN: Gestión de Productos -->
+            <li class="nav-item" id="gestionProductosToggle">
+                <span>🏪 Gestión de Productos</span>
+                <span class="arrow">▼</span>
+            </li>
+            <ul class="submenu" id="gestionProductosSubmenu">
+                <li data-view="bloquear-producto">🔒 Bloquear Producto</li>
+                <li data-view="crear-producto">🆕 Crear Producto</li>
+                <li data-view="editar-producto">✏️ Editar Producto</li>
+                <li data-view="eliminar-producto">🗑️ Eliminar Producto</li>
+            </ul>
+
+            <!-- ✅ BOTÓN SIMPLE: Gestión de Roles y Permisos -->
+            <li class="nav-item" data-view="gestion-roles-permisos">
+                <span>👥 Gestión de Roles y Permisos</span>
+            </li>
+
+            <!-- ✅ NUEVO BOTÓN: Control de Inventario -->
+            <li class="nav-item" data-view="control-inventario">
+                <span>📦 Control de Inventario</span>
+            </li>
+
+            <!-- ✅ BOTÓN: Reportes -->
+            <li class="nav-item" id="reportesToggle">
+                <span>📈 Reportes</span>
+                <span class="arrow">▼</span>
+            </li>
+            <ul class="submenu" id="reportesSubmenu">
+                <li data-report="ventas">📊 Reporte de Ventas</li>
+                <li data-report="productos-populares">🔥 Reporte de Productos Populares</li>
+            </ul>
+
+            <!-- ✅ BOTÓN: Mantenimiento -->
+            <li class="nav-item" id="mantenimientoToggle">
+                <span>🛠️ Mantenimiento</span>
+                <span class="arrow">▼</span>
+            </li>
+            <ul class="submenu" id="mantenimientoSubmenu">
+                <li data-table="usuarios">👥 Usuarios</li>
+                <li data-table="productos">🍔 Productos</li>
+                <li data-table="pedidos">📦 Pedidos</li>
+                <li data-table="categorias">🏷️ Categorías</li>
+                <li data-table="ubicaciones">📍 Ubicaciones</li>
+            </ul>
+
+            <!-- ✅ NUEVOS BOTONES: Interfaz Cliente y KDS -->
+            <li class="nav-item" id="interfazClienteBtn">
+                <span>👤 Interfaz Cliente</span>
+            </li>
+            <li class="nav-item" id="interfazKDSBtn">
+                <span>🖥️ Interfaz KDS</span>
+            </li>
+
+            <!-- ✅ BOTÓN: Cerrar Sesión -->
+            <li class="nav-item" id="logoutBtn">
+                <span>🚪 Cerrar Sesión</span>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <!-- ✅ SECCIÓN: Inicio -->
+        <section id="inicio" class="section active">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Bienvenido al Panel de Administración</h1>
+                </div>
+            </div>
+            <div class="intro-card">
+                <h2>¿Qué es este panel?</h2>
+                <p>Gestión completa de datos con interfaz moderna y notificaciones elegantes.</p>
+            </div>
+        </section>
+
+        <!-- ✅ SECCIÓN: Dashboard -->
+        <section id="dashboard" class="section">
+            <div class="db-container">
+                <header class="db-header">
+                    <div class="db-header-content">
+                        <h1>📊 Dashboard General</h1>
+                        <div class="db-subtitle">MiBarrio Burger - Análisis en Tiempo Real</div>
+                    </div>
+                    <div class="db-date-tag">📅 <span id="db-date-range-text">Cargando...</span></div>
+                </header>
+
+                <section class="db-controls">
+                    <div class="db-control-group">
+                        <label>Filtros Rápidos</label>
+                        <div class="db-btn-group">
+                            <button class="db-btn-preset active" onclick="setDbPreset('today')"
+                                id="db-btn-today">Hoy</button>
+                            <button class="db-btn-preset" onclick="setDbPreset('week')" id="db-btn-week">7 Días</button>
+                            <button class="db-btn-preset" onclick="setDbPreset('month')" id="db-btn-month">Mes</button>
+                            <button class="db-btn-preset" onclick="setDbPreset('year')" id="db-btn-year">Año</button>
+                        </div>
+                    </div>
+                    <div class="db-control-group"><label>Desde</label><input type="date" id="db-start-date"></div>
+                    <div class="db-control-group"><label>Hasta</label><input type="date" id="db-end-date"></div>
+                    <div class="db-control-group db-grow">
+                        <button class="db-btn-apply" onclick="updateDashboard()">Aplicar Filtros</button>
+                    </div>
+                </section>
+
+                <section class="db-kpi-grid">
+                    <div class="db-kpi-box db-primary">
+                        <div class="db-kpi-lbl">Ingresos Totales</div>
+                        <div class="db-kpi-val" id="db-kpi-total">S/. 0.00</div>
+                    </div>
+                    <div class="db-kpi-box db-dark">
+                        <div class="db-kpi-lbl">Total Pedidos</div>
+                        <div class="db-kpi-val" id="db-kpi-orders">0</div>
+                    </div>
+                    <div class="db-kpi-box db-accent">
+                        <div class="db-kpi-lbl">Ticket Promedio</div>
+                        <div class="db-kpi-val" id="db-kpi-ticket">S/. 0.00</div>
+                    </div>
+                    <div class="db-alert-card" id="db-alert-card-container">
+                        <div class="db-alert-title">Alertas de Inventario Bajo</div>
+                        <div class="db-alert-body">
+                            <div class="db-alert-icon-circle" id="db-alert-icon-content">!</div>
+                            <div class="db-alert-text-big" id="db-alert-text-content">Calculating...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="db-charts-grid">
+                    <div class="db-chart-card db-full">
+                        <div class="db-chart-head">📈 Evolución de Ventas</div>
+                        <div class="db-chart-body"><canvas id="dbChartTrend"></canvas></div>
+                    </div>
+                    <div class="db-chart-card">
+                        <div class="db-chart-head">🍩 Ventas por Categoría</div>
+                        <div class="db-chart-body"><canvas id="dbChartCat"></canvas></div>
+                    </div>
+                    <div class="db-chart-card">
+                        <div class="db-chart-head">🏆 Top 5 Productos (Unidades)</div>
+                        <div class="db-chart-body"><canvas id="dbChartTop"></canvas></div>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <!-- ✅ SECCIÓN: Mantenimiento - Usuarios -->
+        <section id="mantenimiento" class="section">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1 id="mantenimientoTitle">Mantenimiento - Usuarios</h1>
+                    <div class="search-and-add">
+                        <input type="text" class="search-box" id="searchInput" placeholder="Buscar en la tabla..." />
+                        <button class="btn btn-primary btn-add" id="btnAdd">➕ Agregar Nuevo</button>
+                    </div>
+                </div>
+            </div>
+            <div class="data-card">
+                <table>
+                    <thead>
+                        <tr id="mantenimientoHeader">
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mantenimientoBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ✅ SECCIÓN: Bloquear Producto -->
+        <section id="bloquear-producto" class="section">
+            <div class="bp-container">
+                <div class="bp-header">
+                    <h1>Gestión de Bloqueo de Productos</h1>
+                    <p class="subtitle">Control de disponibilidad por inventario.</p>
+                </div>
+
+                <div class="bp-main">
+                    <div class="bp-panel">
+                        <h2>Catálogo de Productos</h2>
+                        <div class="bp-catalogo">
+                            <!-- Producto 1 -->
+                            <div class="bp-product-card" data-product-id="1" data-has-out-of-stock="false">
+                                <div class="bp-product-image">
+                                    <img src="img/Hamburguesas/Burger BBQ.jpeg" alt="Hamburguesa Clásica" />
+                                </div>
+                                <div class="bp-product-info">
+                                    <div class="bp-product-name">Hamburguesa Clásica</div>
+                                    <div class="bp-product-price">S/ 10.00</div>
+                                    <div class="bp-ingredients">
+                                        <div class="bp-ingredient-item">Carne de Res <img
+                                                src="img/iconos/check_circle.svg" alt="Disponible"
+                                                class="bp-ingredient-icon"></div>
+                                        <div class="bp-ingredient-item">Pan clásico <img
+                                                src="img/iconos/check_circle.svg" alt="Disponible"
+                                                class="bp-ingredient-icon"></div>
+                                        <div class="bp-ingredient-item">Queso Cheddar <img
+                                                src="img/iconos/check_circle.svg" alt="Disponible"
+                                                class="bp-ingredient-icon"></div>
+                                        <div class="bp-ingredient-item">Lechuga <img src="img/iconos/check_circle.svg"
+                                                alt="Disponible" class="bp-ingredient-icon"></div>
+                                    </div>
+                                </div>
+                                <div class="bp-product-actions">
+                                    <div class="bp-status-indicator">✔️</div>
+                                    <button class="bp-btn bp-btn-red"
+                                        onclick="openBlockPanel(1, 'Hamburguesa Clásica', 'block', false)">Bloquear
+                                        Producto</button>
+                                </div>
+                            </div>
+
+                            <!-- Producto 2 -->
+                            <div class="bp-product-card" data-product-id="2" data-has-out-of-stock="true">
+                                <div class="bp-product-image">
+                                    <img src="img/Hamburguesas/Burger BBQ.jpeg" alt="Hamburguesa BBQ" />
+                                </div>
+                                <div class="bp-product-info">
+                                    <div class="bp-product-name">Hamburguesa BBQ</div>
+                                    <div class="bp-product-price">S/ 15.00</div>
+                                    <div class="bp-ingredients">
+                                        <div class="bp-ingredient-item">Carne de Res <img
+                                                src="img/iconos/check_circle.svg" alt="Disponible"
+                                                class="bp-ingredient-icon"></div>
+                                        <div class="bp-ingredient-item">Pan clásico <img
+                                                src="img/iconos/check_circle.svg" alt="Disponible"
+                                                class="bp-ingredient-icon"></div>
+                                        <div class="bp-ingredient-item">Queso Cheddar <img
+                                                src="img/iconos/check_circle.svg" alt="Disponible"
+                                                class="bp-ingredient-icon"></div>
+                                        <div class="bp-ingredient-item">Salsa BBQ <img src="img/iconos/cancel.svg"
+                                                alt="Agotado" class="bp-ingredient-icon"></div>
+                                        <div class="bp-ingredient-item">Cebolla Caramelizada <img
+                                                src="img/iconos/check_circle.svg" alt="Disponible"
+                                                class="bp-ingredient-icon"></div>
+                                    </div>
+                                </div>
+                                <div class="bp-product-actions">
+                                    <div class="bp-status-indicator">🔒</div>
+                                    <button class="bp-btn bp-btn-green"
+                                        onclick="openBlockPanel(2, 'Hamburguesa BBQ', 'unblock', true)">Desbloquear
+                                        Producto</button>
+                                </div>
+                            </div>
+
+                            <!-- Producto 3 -->
+                            <div class="bp-product-card" data-product-id="3" data-has-out-of-stock="false">
+                                <div class="bp-product-image">
+                                    <img src="img/Hamburguesas/Burger BBQ.jpeg" alt="Gaseosa Mediana" />
+                                </div>
+                                <div class="bp-product-info">
+                                    <div class="bp-product-name">Gaseosa Mediana</div>
+                                    <div class="bp-product-price">S/ 5.00</div>
+                                    <div class="bp-ingredients">
+                                        <div class="bp-ingredient-item">Bebida gaseosa <img
+                                                src="img/iconos/check_circle.svg" alt="Disponible"
+                                                class="bp-ingredient-icon"></div>
+                                        <div class="bp-ingredient-item">Vaso <img src="img/iconos/check_circle.svg"
+                                                alt="Disponible" class="bp-ingredient-icon"></div>
+                                    </div>
+                                </div>
+                                <div class="bp-product-actions">
+                                    <div class="bp-status-indicator">✔️</div>
+                                    <button class="bp-btn bp-btn-red"
+                                        onclick="openBlockPanel(3, 'Gaseosa Mediana', 'block', false)">Bloquear
+                                        Producto</button>
+                                </div>
+                            </div>
+
+                            <!-- Producto 4 -->
+                            <div class="bp-product-card" data-product-id="4" data-has-out-of-stock="true">
+                                <div class="bp-product-image">
+                                    <img src="img/Hamburguesas/Burger BBQ.jpeg" alt="Hamburguesa Especial" />
+                                </div>
+                                <div class="bp-product-info">
+                                    <div class="bp-product-name">Hamburguesa Especial</div>
+                                    <div class="bp-product-price">S/ 18.00</div>
+                                    <div class="bp-ingredients">
+                                        <div class="bp-ingredient-item">Carne de Res <img
+                                                src="img/iconos/check_circle.svg" alt="Disponible"
+                                                class="bp-ingredient-icon"></div>
+                                        <div class="bp-ingredient-item">Pan Brioche <img
+                                                src="img/iconos/check_circle.svg" alt="Disponible"
+                                                class="bp-ingredient-icon"></div>
+                                        <div class="bp-ingredient-item">Salsa BBQ <img src="img/iconos/cancel.svg"
+                                                alt="Agotado" class="bp-ingredient-icon"></div>
+                                        <div class="bp-ingredient-item">Queso Azul <img
+                                                src="img/iconos/check_circle.svg" alt="Disponible"
+                                                class="bp-ingredient-icon"></div>
+                                    </div>
+                                </div>
+                                <div class="bp-product-actions">
+                                    <div class="bp-status-indicator">🔒</div>
+                                    <button class="bp-btn bp-btn-green"
+                                        onclick="openBlockPanel(4, 'Hamburguesa Especial', 'unblock', true)">Desbloquear
+                                        Producto</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel de bloqueo/desbloqueo -->
+                    <div class="bp-panel" id="blockPanel-bp">
+                        <h2 id="panelTitle-bp">🔒 Bloquear Producto</h2>
+                        <div class="bp-form-group">
+                            <label>Producto:</label>
+                            <input type="text" id="selectedProduct-bp" class="bp-form-control" readonly />
+                        </div>
+                        <div class="bp-form-group">
+                            <label id="reasonLabel-bp" class="required">Motivo del bloqueo</label>
+                            <textarea id="blockReason-bp" class="bp-form-control bp-textarea"
+                                placeholder="Ej: “Falta insumo”, “Mantenimiento”"></textarea>
+                            <div id="reasonError-bp" class="bp-error-message">El motivo es obligatorio.</div>
+                        </div>
+                        <div class="bp-warning" id="warningMessage-bp"></div>
+                        <div id="stockErrorContainer-bp"></div>
+                        <div class="bp-form-buttons">
+                            <button class="bp-btn bp-btn-gray" onclick="closeBlockPanel()">Cancelar</button>
+                            <button class="bp-btn" id="confirmActionBtn-bp" onclick="confirmAction()">Bloquear</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notificaciones -->
+                <div class="bp-notificaciones-container">
+                    <div class="bp-notificaciones-panel">
+                        <div class="bp-notificaciones-title">Notificaciones recientes</div>
+                        <div class="bp-notifications-list" id="notificationList-bp">
+                            <div class="bp-notification-item">
+                                <span class="bp-notification-dot">🔴</span>
+                                <span>Producto Hamburguesa BBQ bloqueado: Falta Salsa BBQ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ✅ SECCIÓN: Crear Producto -->
+        <section id="crear-producto" class="section">
+            <div class="cp-container">
+                <header class="cp-header">
+                    <h1>➕ Crear Nuevo Producto</h1>
+                    <p>Agregar un nuevo producto al menú</p>
+                </header>
+
+                <main class="cp-content">
+                    <section id="cp-detalle" class="cp-tab-content active">
+                        <div class="cp-form-section">
+                            <h3>Detalle de Producto</h3>
+                            <form id="cp-productoForm" novalidate>
+                                <div class="cp-form-group">
+                                    <label for="cp-nombre">Nombre del Producto *</label>
+                                    <input type="text" id="cp-nombre" placeholder="Ej: Triple carne" />
+                                </div>
+                                <div class="cp-form-group">
+                                    <label for="cp-descripcion">Descripción *</label>
+                                    <textarea id="cp-descripcion"
+                                        placeholder="Contiene triple carne con salsa especial de la casa"></textarea>
+                                </div>
+                                <div class="cp-form-group">
+                                    <label for="cp-categoria">Categoría *</label>
+                                    <select id="cp-categoria">
+                                        <option value="">Seleccionar...</option>
+                                        <option value="1">Hamburguesas</option>
+                                        <option value="2">Bebidas</option>
+                                        <option value="3">Postres</option>
+                                        <option value="4">Acompañamientos</option>
+                                    </select>
+                                </div>
+                                <div class="cp-form-group">
+                                    <label for="cp-precio">Precio *</label>
+                                    <input type="number" id="cp-precio" step="0.01" min="0" placeholder="S/ 25.00" />
+                                </div>
+                                <div class="cp-form-group">
+                                    <label for="cp-stock">Stock Inicial *</label>
+                                    <input type="number" id="cp-stock" min="0" placeholder="0" value="0" />
+                                </div>
+                                <div class="cp-form-group">
+                                    <label for="cp-imagen">Imagen *</label>
+                                    <input type="file" id="cp-imagen" accept="image/*" />
+                                    <div class="cp-image-preview" id="cp-imagePreview">
+                                        <div class="cp-image-placeholder">📷 Arrastre o seleccione una imagen</div>
+                                    </div>
+                                </div>
+                                <div class="cp-form-actions">
+                                    <button type="submit" class="cp-btn cp-btn-primary" id="cp-btnCrear">Crear
+                                        Producto</button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </section>
+
+        <!-- ✅ SECCIÓN: Editar Producto -->
+        <section id="editar-producto" class="section">
+            <div class="ep-container">
+                <header class="ep-header">
+                    <h1>✏️ Editar Productos del Menú</h1>
+                    <p>Modifica la información de productos</p>
+                </header>
+
+                <div class="seccion-productos">
+                    <div class="busqueda-contenedor">
+                        <input type="text" id="busquedaInput" placeholder="Buscar Productos" />
+                        <select id="categoriaFiltro">
+                            <option value="">Todas las categorías</option>
+                            <option value="1">Hamburguesas</option>
+                            <option value="2">Bebidas</option>
+                            <option value="3">Postres</option>
+                            <option value="4">Acompañamientos</option>
+                        </select>
+                    </div>
+                    <div class="lista-productos" id="listaProductos">
+                    </div>
+                </div>
+
+                <div class="panel-inferior" id="panelEdicion" style="display: none;">
+                    <div class="panel-seccion panel-detalle">
+                        <h2>Detalles del Producto</h2>
+
+                        <div class="ep-grid-2">
+                            <div class="form-group">
+                                <label>Código</label>
+                                <input type="text" id="codigo" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label>Estado</label>
+                                <select id="estado">
+                                    <option value="Activo">Activo</option>
+                                    <option value="Inactivo">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nombre del Producto</label>
+                            <input type="text" id="nombre" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <textarea id="descripcion" rows="3" required></textarea>
+                        </div>
+
+                        <div class="ep-grid-3">
+                            <div class="form-group">
+                                <label>Categoría</label>
+                                <select id="categoria">
+                                    <option value="1">Hamburguesas</option>
+                                    <option value="2">Bebidas</option>
+                                    <option value="3">Postres</option>
+                                    <option value="4">Acompañamientos</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Precio (S/)</label>
+                                <input type="number" id="precio" step="0.01" min="0" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Stock</label>
+                                <input type="number" id="stock" min="0" required />
+                            </div>
+                        </div>
+
+                        <p class="nota">Modificar la imagen requiere un endpoint de subida separado.</p>
+
+                    </div>
+
+                    <button class="boton-guardar" id="guardarBtn">Guardar Cambios</button>
+                    <div id="mensaje"></div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- ✅ SECCIÓN: Eliminar Producto -->
+        <section id="eliminar-producto" class="section">
+            <div class="container">
+                <header>
+                    <h1>Eliminar Productos</h1>
+                    <p>Elimina Productos</p>
+                </header>
+
+                <main class="product-sections">
+                    <!-- lista de productos -->
+                    <section class="product-list active">
+                        <h2>Lista de Productos</h2>
+                        <div class="table-scroll">
+                            <table id="table-active">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Categoría</th>
+                                        <th>Precio</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-active"></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </section>
+
+        <!-- ✅ SECCIÓN VACÍA: Gestión de Roles y Permisos -->
+        <section id="gestion-roles-permisos" class="section">
+            <div class="grp-container">
+                <header class="grp-header">
+                    <h1>👥 Gestión de Roles y Permisos</h1>
+                    <p>Asigna y modifica los roles de los usuarios del sistema</p>
+                </header>
+
+                <!-- Panel principal (igual que en Crear Producto) -->
+                <div class="grp-panel">
+                    <!-- Filtros (dentro del panel) -->
+                    <div class="grp-filters">
+                        <input type="text" id="grp-searchInput" placeholder="Buscar por nombre..." />
+                        <select id="grp-roleFilter">
+                            <option value="">Todos los roles</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Personal de cocina">Personal de cocina</option>
+                            <option value="Cliente">Cliente</option>
+                        </select>
+                    </div>
+
+                    <!-- Tabla -->
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Rol</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="grp-usersTableBody">
+                            <!-- Llenado por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Modal de edición -->
+            <div class="grp-modal-overlay" id="grp-editModal">
+                <div class="grp-modal">
+                    <div class="grp-modal-header">
+                        <h3>✏️ Editar Rol de <span id="grp-editUserName"></span></h3>
+                    </div>
+                    <div class="grp-modal-body">
+                        <input type="hidden" id="grp-editUserId" />
+                        <div class="grp-form-group">
+                            <label for="grp-roleSelect">Selecciona un rol</label>
+                            <select id="grp-roleSelect">
+                                <option value="Admin">Admin</option>
+                                <option value="Personal de cocina">Personal de cocina</option>
+                                <option value="Cliente">Cliente</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grp-modal-footer">
+                        <button class="grp-btn grp-btn-secondary" id="grp-cancelEdit">Cancelar</button>
+                        <button class="grp-btn grp-btn-primary" id="grp-saveEdit">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ✅ SECCIÓN: Control de Inventario -->
+        <section id="control-inventario" class="section full-inventory">
+            <iframe src="ControlInventario.html" frameborder="0" class="inventario-iframe">
+            </iframe>
+        </section>
+
+        <!-- ✅ SECCIÓN: Reporte de Ventas -->
+        <section id="reporte-ventas" class="section">
+            <div class="rv-container">
+                <header class="rv-header">
+                    <div>
+                        <h1>💰 Reporte de Ventas</h1>
+                        <div class="rv-subtitle">Sistema de Gestión - Vista Administrativa</div>
+                    </div>
+                    <div class="rv-pdf-controls">
+                        <div class="rv-pdf-info" id="rv-pdf-context-label"></div>
+                        <button class="rv-btn-pdf" onclick="generateSalesPDF()"><span>📄</span> Generar PDF</button>
+                    </div>
+                </header>
+
+                <section class="rv-kpi-grid">
+                    <div class="rv-kpi-card">
+                        <div class="rv-kpi-title">Ingresos Totales</div>
+                        <div class="rv-kpi-value" id="rv-kpi-revenue">S/. 0.00</div>
+                    </div>
+                    <div class="rv-kpi-card">
+                        <div class="rv-kpi-title">Categoría Mayor Ingreso</div>
+                        <div class="rv-kpi-value-text">
+                            <div id="rv-kpi-top-cat-name">-</div>
+                            <div id="rv-kpi-top-cat-value" class="rv-kpi-subtext"></div>
+                        </div>
+                    </div>
+                    <div class="rv-kpi-card">
+                        <div class="rv-kpi-title">Producto Mayor Ingreso ⭐</div>
+                        <div class="rv-kpi-value-text">
+                            <div id="rv-kpi-top-prod-name">-</div>
+                            <div id="rv-kpi-top-prod-value" class="rv-kpi-subtext"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="rv-controls-section">
+                    <div class="rv-control-group">
+                        <label class="rv-control-label">Período</label>
+                        <div class="rv-btn-group">
+                            <button class="rv-btn active" onclick="setRvPreset('today')" id="rv-btn-today">Hoy</button>
+                            <button class="rv-btn" onclick="setRvPreset('week')" id="rv-btn-week">7 Días</button>
+                            <button class="rv-btn" onclick="setRvPreset('month')" id="rv-btn-month">Mes</button>
+                            <button class="rv-btn" onclick="setRvPreset('year')" id="rv-btn-year">Año</button>
+                        </div>
+                    </div>
+                    <div class="rv-control-group">
+                        <label class="rv-control-label">Categoría</label>
+                        <select id="rv-category-filter" onchange="applyRvFilters()">
+                            <option value="all">Todas las categorías</option>
+                            <option value="Hamburguesas">Hamburguesas</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Acompañamientos">Acompañamientos</option>
+                            <option value="Postres">Postres</option>
+                        </select>
+                    </div>
+                    <div class="rv-control-group">
+                        <label class="rv-control-label">Rango Manual</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="date" id="rv-start-date" />
+                            <input type="date" id="rv-end-date" />
+                        </div>
+                    </div>
+                    <div class="rv-control-group rv-btn-apply-container">
+                        <button class="rv-btn-apply" onclick="applyRvFilters()">Aplicar Filtros <span>🔍</span></button>
+                    </div>
+                </section>
+
+                <section class="rv-table-container">
+                    <div class="rv-table-scroll">
+                        <table id="rv-sales-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%">Producto</th>
+                                    <th style="width: 20%">Personalización</th>
+                                    <th style="width: 15%">Categoría</th>
+                                    <th style="width: 10%" class="text-right">Precio Unit.</th>
+                                    <th style="width: 8%" class="text-right">Cant.</th>
+                                    <th style="width: 15%" class="text-right">Total</th>
+                                    <th style="width: 12%; text-align: center;">Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rv-table-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <!-- ✅ SECCIÓN: Reporte de Productos Populares -->
+        <section id="reporte-productos-populares" class="section">
+            <div class="rpp-container">
+                <header class="rpp-header">
+                    <div>
+                        <h1>🏆 Reporte de Productos Populares</h1>
+                        <div class="rpp-subtitle">Análisis de Demanda y Preferencias</div>
+                    </div>
+                    <div class="rpp-pdf-controls">
+                        <div class="rpp-pdf-info" id="rpp-pdf-context-label"></div>
+                        <button class="rpp-btn-pdf" onclick="generatePopPDF()"><span>📄</span> Generar PDF</button>
+                    </div>
+                </header>
+
+                <section class="rpp-kpi-grid">
+                    <div class="rpp-kpi-card">
+                        <div class="rpp-kpi-title">Producto Más Vendido</div>
+                        <div class="rpp-kpi-value-text">
+                            <div id="rpp-kpi-top-sales-name">-</div>
+                            <div id="rpp-kpi-top-sales-value" class="rpp-kpi-subtext"></div>
+                        </div>
+                    </div>
+                    <div class="rpp-kpi-card">
+                        <div class="rpp-kpi-title">Categoría Más Vendida</div>
+                        <div class="rpp-kpi-value-text">
+                            <div id="rpp-kpi-top-cat-name">-</div>
+                            <div id="rpp-kpi-top-cat-value" class="rpp-kpi-subtext"></div>
+                        </div>
+                    </div>
+                    <div class="rpp-kpi-card">
+                        <div class="rpp-kpi-title">Total Unidades Vendidas</div>
+                        <div class="rpp-kpi-value" id="rpp-kpi-total-units">0</div>
+                    </div>
+                </section>
+
+                <section class="rpp-controls-section">
+                    <div class="rpp-control-group">
+                        <label class="rpp-control-label">Período</label>
+                        <div class="rpp-btn-group">
+                            <button class="rpp-btn active" onclick="setRppPreset('today')"
+                                id="rpp-btn-today">Hoy</button>
+                            <button class="rpp-btn" onclick="setRppPreset('week')" id="rpp-btn-week">7 Días</button>
+                            <button class="rpp-btn" onclick="setRppPreset('month')" id="rpp-btn-month">Mes</button>
+                            <button class="rpp-btn" onclick="setRppPreset('year')" id="rpp-btn-year">Año</button>
+                        </div>
+                    </div>
+                    <div class="rpp-control-group">
+                        <label class="rpp-control-label">Categoría</label>
+                        <select id="rpp-category-filter" onchange="applyRppFilters()">
+                            <option value="all">Todas las categorías</option>
+                            <option value="Hamburguesas">Hamburguesas</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Acompañamientos">Acompañamientos</option>
+                            <option value="Postres">Postres</option>
+                        </select>
+                    </div>
+                    <div class="rpp-control-group">
+                        <label class="rpp-control-label">Rango Manual</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="date" id="rpp-start-date" />
+                            <input type="date" id="rpp-end-date" />
+                        </div>
+                    </div>
+                    <div class="rpp-control-group rpp-btn-apply-container">
+                        <button class="rpp-btn-apply" onclick="applyRppFilters()">Analizar Ranking
+                            <span>🔍</span></button>
+                    </div>
+                </section>
+
+                <section class="rpp-table-container">
+                    <div class="rpp-table-scroll">
+                        <table id="rpp-sales-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%; text-align: center;">#</th>
+                                    <th style="width: 25%">Producto</th>
+                                    <th style="width: 15%">Categoría</th>
+                                    <th style="width: 15%" class="text-right">Unidades Vendidas</th>
+                                    <th style="width: 15%" class="text-right">Ingresos Generados</th>
+                                    <th style="width: 25%">Popularidad (% del Total)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rpp-table-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <!-- ✅ Modal genérico para CRUD (Crear, Leer, Actualizar, Eliminar) -->
+        <div class="modal-overlay" id="crudModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Crear Registro</h3>
+                </div>
+                <div class="modal-body">
+                    <form id="crudForm"></form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" id="btnCancel">Cancelar</button>
+                    <button class="btn btn-primary" id="btnSave">Guardar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ✅ Modal de confirmación para "Cerrar Sesión" -->
+        <div class="modal-overlay" id="confirmModal">
+            <div class="modal confirm-modal">
+                <div class="modal-body">
+                    <h3>¿Deseas cerrar sesión?</h3>
+                    <div class="modal-footer">
+                        <button class="btn" id="confirmCancel">Cancelar</button>
+                        <button class="btn btn-danger" id="confirmProceed">Cerrar sesión</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ✅ Modal de confirmación para "Eliminar Producto" (diseño idéntico al de cerrar sesión, pero independiente) -->
+        <!-- Modal personalizado para eliminar producto (independiente pero idéntico visualmente al de cerrar sesión) -->
+        <div class="eliminar-modal-overlay">
+            <div class="eliminar-modal">
+                <div class="eliminar-modal-body">
+                    <h3></h3>
+                </div>
+                <div class="eliminar-modal-footer">
+                    <button class="btn">Cancelar</button>
+                    <button class="btn btn-danger">Eliminar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ✅ Contenedor para notificaciones tipo toast -->
+        <div id="toastContainer"></div>
+
+        <!-- ✅ Admin Panel Main Script (CARGA PRIMERO para que showToast esté disponible) -->
+        <script src="js/admin.js"></script>
+
+        <!-- ✅ API Wrapper - DEBE CARGARSE SEGUNDO -->
+        <script src="js/api.js"></script>
+
+        <!-- ✅ Scripts de Producto Management -->
+        <script src="js/bloquear_producto.js"></script>
+        <script src="js/crear_producto.js"></script>
+        <script src="js/editar_producto.js"></script>
+        <script src="js/eliminar_producto.js"></script>
+        <script src="js/bloquear_producto.js"></script>
+        <!-- ✅ NUEVO -->
+        <script src="js/gestion_roles_permisos.js"></script>
+        <script src="js/mantenimiento.js"></script> <!-- ✅ NUEVO -->
+        <script src="js/dashboard.js"></script>
+        <script src="js/reporte_ventas.js"></script>
+        <script src="js/reporte_productos_populares.js"></script>
+        <script src="js/admin.js"></script>
+</body>
+
+</html>

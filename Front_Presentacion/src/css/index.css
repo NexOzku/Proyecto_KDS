@@ -1,0 +1,267 @@
+:root {
+    --bg-gradient: linear-gradient(135deg, #fffaf5, #ffecda);
+    --card-bg: #ffffff;
+    --orange-500: #ff9800;
+    --orange-600: #f57c00;
+    --dark: #2c2c2c;
+    --success: #4caf50;
+    --error: #f44336;
+    --border-radius: 20px;
+    --shadow: 0 14px 40px rgba(255, 152, 0, 0.14);
+    --transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: var(--bg-gradient);
+    color: var(--dark);
+    overflow: hidden;
+}
+
+/* ✅ Ocultar el ojo del navegador en Chrome/Edge */
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
+}
+
+/* ✅ Contenedor de la tarjeta giratoria */
+.flip-container {
+    width: 100%;
+    max-width: 480px;
+    min-height: 600px;
+    perspective: 1200px;
+}
+
+.flipper {
+    position: relative;
+    width: 100%;
+    min-height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.flipper.flipped {
+    transform: rotateY(180deg);
+}
+
+.flip-panel {
+    position: absolute;
+    width: 100%;
+    min-height: 100%;
+    backface-visibility: hidden;
+    border-radius: var(--border-radius);
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    padding: 30px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-y: auto;
+    max-height: 90vh;
+}
+
+.flip-panel.back {
+    transform: rotateY(180deg);
+}
+
+h2 {
+    font-size: 1.85rem;
+    margin-bottom: 18px;
+    color: var(--orange-600);
+    text-align: center;
+}
+
+/* ✅ Estilos de los formularios */
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 0.92rem;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 11px 40px 11px 15px;
+    border: 2px solid #e8e8e8;
+    border-radius: 12px;
+    font-size: 0.97rem;
+    font-family: Arial, sans-serif;
+    transition: var(--transition);
+    -webkit-text-security: none;
+}
+
+.form-group select {
+    padding: 10px 14px;
+    background-color: white;
+    cursor: pointer;
+    color: var(--dark);
+}
+
+/* ✅Truco para evitar el ojo de Chrome */
+input[type="password"] {
+    -webkit-text-security: disc !important;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--orange-500);
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2);
+}
+
+/* ✅ Botón para mostrar/ocultar contraseña */
+.toggle-password-btn {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 1.45rem;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+/* ✅ Contenedor de fuerza de contraseña */
+.password-strength {
+    margin-top: 6px;
+}
+
+/* ✅ Barra de fuerza de contraseña */
+.strength-bar {
+    height: 4px;
+    background: #f0f0f0;
+    border-radius: 2px;
+    margin-top: 4px;
+    overflow: hidden;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--error);
+    transition: var(--transition);
+}
+
+.strength-text {
+    font-size: 0.75rem;
+    margin-top: 4px;
+    color: #777;
+    font-family: Arial, sans-serif;
+    line-height: 1.2;
+}
+
+/* ✅ Mensajes de validación */
+.form-group .error {
+    color: var(--error);
+    font-size: 0.75rem;
+    margin-top: 3px;
+    display: none;
+    font-family: Arial, sans-serif;
+    line-height: 1.2;
+}
+
+.form-group.invalid .error {
+    display: block;
+}
+
+.form-group.valid input,
+.form-group.valid select {
+    border-color: var(--success);
+}
+
+.form-group.invalid input,
+.form-group.invalid select {
+    border-color: var(--error);
+}
+
+/* ✅ Botones */
+.btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.01rem;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 10px;
+    font-family: Arial, sans-serif;
+}
+
+.btn-primary {
+    background: var(--orange-500);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--orange-600);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ✅ Enlace para cambiar entre formularios */
+.switch-link {
+    margin-top: 12px;
+    font-size: 0.92rem;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.switch-link a {
+    color: var(--orange-500);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.switch-link a:hover {
+    text-decoration: underline;
+}
+
+/* ✅ ESTILOS RESPONSIVOS */
+@media (max-width: 520px) {
+    .flip-container {
+        height: auto;
+        min-height: 540px;
+    }
+
+    .flip-panel {
+        padding: 44px 26px;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+}

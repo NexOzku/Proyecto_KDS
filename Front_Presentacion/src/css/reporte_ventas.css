@@ -1,0 +1,248 @@
+/* === REPORTE VENTAS (Prefijo: rv-) === */
+#reporte-ventas .rv-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#reporte-ventas .rv-header {
+    background: white;
+    padding: 15px 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 5px solid #2563eb;
+}
+
+#reporte-ventas .rv-header h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+    color: #2563eb;
+}
+
+#reporte-ventas .rv-subtitle {
+    margin: 5px 0 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+#reporte-ventas .rv-pdf-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#reporte-ventas .rv-pdf-info {
+    font-size: 12px;
+    color: #64748b;
+    font-style: italic;
+    text-align: right;
+}
+
+#reporte-ventas .rv-btn-pdf {
+    background: white;
+    color: #0f172a;
+    border: 1px solid #0f172a;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-weight: bold;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#reporte-ventas .rv-btn-pdf:hover {
+    background: #f8fafc;
+}
+
+#reporte-ventas .rv-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+#reporte-ventas .rv-kpi-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    position: relative;
+    border-left: 4px solid #2563eb;
+}
+
+#reporte-ventas .rv-kpi-title {
+    font-size: 11px;
+    font-weight: bold;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#reporte-ventas .rv-kpi-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 8px;
+    color: #2563eb;
+}
+
+#reporte-ventas .rv-kpi-value-text {
+    font-size: 16px;
+    line-height: 1.4;
+    color: #0f172a;
+    margin-top: 8px;
+    font-weight: bold;
+}
+
+#reporte-ventas .rv-kpi-subtext {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: bold;
+}
+
+#reporte-ventas .rv-controls-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+    border: 1px solid #ccc;
+}
+
+#reporte-ventas .rv-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#reporte-ventas .rv-control-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+#reporte-ventas input[type="date"],
+#reporte-ventas select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    min-width: 140px;
+}
+
+#reporte-ventas .rv-btn-group {
+    display: flex;
+    gap: 5px;
+}
+
+#reporte-ventas .rv-btn {
+    padding: 8px 14px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+#reporte-ventas .rv-btn:hover {
+    background: #f8fafc;
+    color: #2563eb;
+    border-color: #2563eb;
+}
+
+#reporte-ventas .rv-btn.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+#reporte-ventas .rv-btn-apply-container {
+    flex-grow: 1;
+}
+
+#reporte-ventas .rv-btn-apply {
+    width: 100%;
+    background: #2563eb;
+    color: white;
+    border: none;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+#reporte-ventas .rv-btn-apply:hover {
+    background: #1d4ed8;
+}
+
+#reporte-ventas .rv-table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    overflow: hidden;
+}
+
+#reporte-ventas .rv-table-scroll {
+    overflow-y: auto;
+    overflow-x: auto;
+    max-height: 500px;
+    width: 100%;
+}
+
+#reporte-ventas table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+#reporte-ventas thead {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    z-index: 10;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+#reporte-ventas th {
+    padding: 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: bold;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+#reporte-ventas td {
+    padding: 12px 14px;
+    font-size: 13px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #0f172a;
+    vertical-align: top;
+}
+
+#reporte-ventas tr:hover {
+    background-color: #f8fafc;
+}
