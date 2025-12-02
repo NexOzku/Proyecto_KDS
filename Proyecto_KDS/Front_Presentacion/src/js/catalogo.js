@@ -99,7 +99,6 @@ async function loadAndRenderProducts() {
     console.log('No se pudieron cargar productos.');
     return;
   }
-  
   initDrinkOptions();
   // 2. Definir los contenedores por ID
   const burgerCarousel = document.getElementById('burger-carousel');   // ID para Categoría 1
