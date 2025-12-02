@@ -99,16 +99,16 @@ async function loadAndRenderProducts() {
     console.log('No se pudieron cargar productos.');
     return;
   }
-  burgerCarousel.innerHTML = '';
-drinkCarousel.innerHTML  = '';
-combosCarousel.innerHTML = '';
+  
   initDrinkOptions();
   // 2. Definir los contenedores por ID
   const burgerCarousel = document.getElementById('burger-carousel');   // ID para Categoría 1
   const drinkCarousel = document.getElementById('drink-carousel');    // ID para Categoría 2
   const combosCarousel = document.getElementById('combos-carousel');  // ID para Categoría 3
   const combosEmpty = document.getElementById('combos-empty');
-
+burgerCarousel.innerHTML = '';
+drinkCarousel.innerHTML  = '';
+combosCarousel.innerHTML = '';
   inicializarEventosCarrito();
   let combosCount = 0; // Contador para saber si hay combos
 
